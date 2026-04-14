@@ -3,11 +3,9 @@
 <head>
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1"/>
-<title>18 walking stories on one map of New York — Pedestrian flows</title>
+<title>How New York walks — every sidewalk, every hour</title>
 <link rel="stylesheet" href="https://use.typekit.net/qqk2vto.css">
-<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
-  integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
-  crossorigin=""/>
+<link rel="stylesheet" href="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.css"/>
 <style>
   :root{
     --chartreuse:#dde44c; --orange:#ff7c53; --magenta:#e7466d;
@@ -17,205 +15,273 @@
   *{box-sizing:border-box}
   html,body{margin:0;padding:0;background:var(--paper);color:var(--ink);
     font-family:"halyard-text",Inter,system-ui,sans-serif;font-weight:300;}
-  .frame{max-width:1040px;margin:0 auto;padding:28px 22px 32px;}
+  .frame{max-width:1080px;margin:0 auto;padding:28px 22px 32px;}
   .eyebrow{font-size:11px;letter-spacing:.14em;text-transform:uppercase;
     font-weight:700;color:var(--magenta);margin:0 0 8px;}
   h1{font-family:"halyard-text",Inter,sans-serif;font-weight:900;
-    font-size:42px;line-height:1.04;letter-spacing:-0.012em;margin:0 0 10px;}
+    font-size:44px;line-height:1.03;letter-spacing:-0.012em;margin:0 0 10px;}
   h1 em{font-style:normal;color:var(--magenta);}
   .dek{font-size:16px;line-height:1.5;color:#2c2c2c;font-weight:300;
-    max-width:720px;margin:0 0 18px;}
+    max-width:780px;margin:0 0 18px;}
   .dek b{font-weight:700;}
 
-  .legend-row{display:flex;flex-wrap:wrap;gap:14px 18px;
-    font-size:12px;color:var(--charcoal);font-weight:400;margin:6px 0 14px;}
-  .legend-row .chip{display:inline-flex;align-items:center;gap:6px;}
-  .chip .dot{width:12px;height:12px;border-radius:50%;display:inline-block;
-    border:1.5px solid #fff;box-shadow:0 0 0 1px rgba(0,0,0,.18);}
+  /* control strip */
+  .ctrls{display:flex;flex-wrap:wrap;gap:14px 22px;align-items:center;
+    padding:12px 14px;border:1px solid var(--rule);border-radius:4px;
+    background:#fff;margin-bottom:12px;}
+  .ctrls .grp{display:flex;align-items:center;gap:8px;}
+  .ctrls .lbl{font-size:11px;letter-spacing:.1em;text-transform:uppercase;
+    font-weight:700;color:var(--charcoal);}
+  .seg{display:inline-flex;border:1px solid var(--rule);border-radius:3px;
+    overflow:hidden;}
+  .seg button{border:0;background:#fff;padding:7px 11px;
+    font:inherit;font-size:12px;font-weight:700;color:var(--ink);
+    cursor:pointer;border-right:1px solid var(--rule);}
+  .seg button:last-child{border-right:0;}
+  .seg button.on{background:var(--ink);color:#fff;}
+  .seg button:hover:not(.on){background:#f2f1ea;}
 
   .map-wrap{position:relative;border:1px solid var(--rule);border-radius:4px;
     overflow:hidden;background:#fff;}
-  #map{width:100%;height:640px;}
+  #map{width:100%;height:680px;}
   @media (max-width:720px){ #map{height:520px;} h1{font-size:32px;} }
+  .maplibregl-canvas{outline:none;}
 
-  /* Leaflet pin */
-  .pin{width:30px;height:30px;border-radius:50%;display:flex;align-items:center;
-    justify-content:center;font-weight:900;font-size:13px;color:#fff;
-    border:2px solid #fff;box-shadow:0 2px 6px rgba(0,0,0,.22);
-    font-family:"halyard-text",Inter,sans-serif;}
-  .leaflet-div-icon{background:transparent;border:0;}
-  .leaflet-popup-content-wrapper{border-radius:4px;padding:0;
-    box-shadow:0 6px 22px rgba(0,0,0,.18);}
-  .leaflet-popup-content{margin:0;min-width:270px;max-width:320px;
-    font-family:"halyard-text",Inter,sans-serif;}
-  .pop{padding:14px 16px 14px;}
-  .pop .cat{font-size:10px;letter-spacing:.12em;text-transform:uppercase;
-    font-weight:900;color:var(--magenta);margin-bottom:4px;}
-  .pop .addr{font-size:16px;font-weight:800;color:var(--ink);line-height:1.2;
-    margin-bottom:2px;}
-  .pop .hood{font-size:12px;color:var(--charcoal);margin-bottom:10px;}
-  .pop .big{font-size:13px;font-weight:700;color:var(--ink);margin-bottom:10px;
-    line-height:1.35;}
-  .pop .big em{font-style:normal;background:var(--chartreuse);padding:0 4px;}
-  .pop .row{display:flex;justify-content:space-between;font-size:12px;
-    color:var(--charcoal);padding:3px 0;border-bottom:1px dotted var(--rule);}
-  .pop .row b{color:var(--ink);font-weight:700;}
-  .pop .row:last-of-type{border-bottom:0;}
-  .pop .link{display:inline-block;margin-top:8px;font-size:11px;font-weight:700;
-    color:var(--cerulean);text-decoration:none;
-    border-bottom:1px solid var(--cerulean);}
+  .legend{display:flex;flex-wrap:wrap;gap:14px 20px;align-items:center;
+    margin:12px 0 0;font-size:12px;color:var(--charcoal);}
+  .legend .ramp{position:relative;width:260px;height:10px;border-radius:6px;
+    background:linear-gradient(90deg,#e7e6df 0%,#dde44c 35%,#ff7c53 70%,#e7466d 100%);
+    border:1px solid var(--rule);}
+  .legend .ramp .ticks{position:absolute;left:0;right:0;top:12px;
+    display:flex;justify-content:space-between;font-size:10.5px;color:var(--charcoal);
+    font-weight:600;}
+  .legend .note{color:var(--charcoal);font-style:italic;}
 
-  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));
-    gap:10px 14px;margin-top:18px;}
-  .card{border:1px solid var(--rule);border-radius:4px;padding:11px 12px;
-    cursor:pointer;background:#fff;transition:border-color .12s,transform .12s;
-    text-align:left;font:inherit;width:100%;}
-  .card:hover{border-color:var(--ink);transform:translateY(-1px);}
-  .card .n{font-size:11px;color:var(--charcoal);letter-spacing:.1em;
-    text-transform:uppercase;font-weight:700;display:flex;align-items:center;gap:6px;}
-  .card .n .mini{width:10px;height:10px;border-radius:50%;display:inline-block;}
-  .card .road{font-size:14px;font-weight:800;color:var(--ink);margin:2px 0 1px;
-    line-height:1.2;}
-  .card .sub{font-size:11.5px;color:var(--charcoal);}
+  .stat-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));
+    gap:12px;margin:22px 0 10px;}
+  .stat{border:1px solid var(--rule);border-radius:4px;padding:10px 12px;background:#fff;}
+  .stat .k{font-size:11px;letter-spacing:.1em;text-transform:uppercase;
+    font-weight:700;color:var(--charcoal);}
+  .stat .v{font-family:"halyard-text";font-weight:900;font-size:24px;
+    letter-spacing:-0.01em;margin-top:1px;color:var(--ink);}
+  .stat .s{font-size:11.5px;color:var(--charcoal);margin-top:1px;}
 
-  footer{margin-top:20px;padding-top:14px;border-top:1px solid var(--rule);
+  footer{margin-top:22px;padding-top:14px;border-top:1px solid var(--rule);
     font-size:11px;color:var(--charcoal);line-height:1.55;}
   footer a{color:var(--cerulean);}
   footer b{color:var(--ink);font-weight:700;}
+
+  /* hover readout */
+  .readout{position:absolute;top:12px;left:12px;background:#fff;
+    border:1px solid var(--ink);border-radius:4px;padding:9px 12px;
+    font-size:12px;line-height:1.35;box-shadow:0 4px 14px rgba(0,0,0,.10);
+    min-width:200px;pointer-events:none;z-index:10;}
+  .readout.hide{display:none;}
+  .readout .rv{font-family:"halyard-text";font-weight:900;font-size:22px;
+    color:var(--magenta);letter-spacing:-0.01em;}
+  .readout .rl{font-size:10px;letter-spacing:.1em;text-transform:uppercase;
+    font-weight:700;color:var(--charcoal);}
+  .readout .row{display:flex;justify-content:space-between;gap:12px;color:var(--charcoal);
+    font-size:11.5px;padding-top:2px;}
+  .readout .row b{color:var(--ink);font-weight:700;}
 </style>
 </head>
 <body>
 <div class="frame">
 
   <p class="eyebrow">Pedestrian flows / New York City</p>
-  <h1>18 walking stories, <em>one map of New York.</em></h1>
-  <p class="dek">A block-by-block model from MIT's City Form Lab estimates hourly pedestrian
-    volume on every one of New York's <b>315,577 sidewalk and crosswalk segments</b>.
-    We mined it for 18 blocks that each tell a different story — the citywide busiest,
-    the morning-rush kings, the weekend-only destinations, the office blocks that go
-    dead on Saturday, and the busiest foot traffic in every outer borough.
-    <b>Click any numbered pin</b> for the street, the volumes, and the angle.</p>
+  <h1>Every sidewalk. <em>Every hour.</em></h1>
+  <p class="dek">A block-by-block model from MIT's City Form Lab estimates hourly
+    pedestrian volume on all <b>315,577 sidewalk and crosswalk segments</b> in the
+    five boroughs. Use the controls to watch the city's walking patterns change
+    between weekday morning rush, midday, evening rush, and the weekend.
+    Brighter and thicker lines carry more foot traffic.</p>
 
-  <div class="legend-row" id="legend"></div>
+  <div class="ctrls">
+    <div class="grp">
+      <span class="lbl">Day</span>
+      <div class="seg" id="daySeg">
+        <button data-v="wkdy" class="on">Weekday</button>
+        <button data-v="wknd">Weekend</button>
+      </div>
+    </div>
+    <div class="grp">
+      <span class="lbl">Time of day</span>
+      <div class="seg" id="todSeg">
+        <button data-v="AM" class="on">AM rush (8–10a)</button>
+        <button data-v="MD">Midday (12–2p)</button>
+        <button data-v="PM">PM rush (5–7p)</button>
+      </div>
+    </div>
+  </div>
 
   <div class="map-wrap">
     <div id="map"></div>
+    <div id="readout" class="readout hide"></div>
   </div>
 
-  <div class="grid" id="list"></div>
+  <div class="legend">
+    <span style="font-weight:700;color:var(--ink)">Pedestrians per hour</span>
+    <div class="ramp"><div class="ticks"><span>0</span><span>250</span><span>750</span><span>1,500</span><span>3,000+</span></div></div>
+    <span class="note">Hover or tap any street for its hourly estimate.</span>
+  </div>
+
+  <div class="stat-row">
+    <div class="stat"><div class="k">Segments modeled</div><div class="v">315,577</div>
+      <div class="s">sidewalk + crosswalk segments citywide</div></div>
+    <div class="stat"><div class="k">Field counts</div><div class="v">1,011</div>
+      <div class="s">manual counts used to calibrate the model</div></div>
+    <div class="stat"><div class="k">Busiest segment</div><div class="v">3,398 /hr</div>
+      <div class="s">W 32nd St near Herald Square, weekday evening</div></div>
+    <div class="stat"><div class="k">Time slots</div><div class="v">6</div>
+      <div class="s">weekday AM · midday · PM and weekend AM · midday · PM</div></div>
+  </div>
 
   <footer>
-    <b>Source:</b> Sevtsuk, A., Basu, R., et al. <i>Estimating Pedestrian Flows
-    on Street Networks in New York City</i> (<i>Nature Cities</i>, 2025), based on
-    the NYC Pedestrian Network Estimates dataset (2018–2019). Volumes are modeled
-    estimates calibrated against 1,011 field counts, not direct observation.
-    Streets are named via OpenStreetMap reverse-geocoding of each segment's midpoint.
-    Because the model leans on network accessibility and transit proximity, it can
-    under-predict recreational and seasonal foot traffic (beaches, parks, boardwalks)
-    — a limitation the authors note — so outer-borough leisure peaks are likely
-    larger in reality than the figures shown here.
+    <b>Source:</b> Sevtsuk, A., Basu, R., et al. <i>Estimating Pedestrian Flows on Street
+    Networks in New York City</i> (<i>Nature Cities</i>, 2025), using the NYC Pedestrian
+    Network Estimates dataset (2018–2019). Volumes are modeled estimates calibrated against
+    1,011 field counts — not direct observation. The model leans on street-network accessibility
+    and transit proximity, so it can under-predict recreational and seasonal foot traffic at
+    beaches, parks, and boardwalks. Basemap © <a href="https://carto.com/attributions">CARTO</a>
+    / <a href="https://openstreetmap.org/copyright">OpenStreetMap</a>. Tiles built with
+    <a href="https://github.com/felt/tippecanoe">tippecanoe</a>.
     &nbsp;·&nbsp; Produced for <b>Vital City</b>.
   </footer>
 </div>
 
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
-  integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
-  crossorigin=""></script>
+<script src="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.js"></script>
+<script src="https://unpkg.com/pmtiles@3.2.0/dist/pmtiles.js"></script>
 <script>
-const VC = { chartreuse:"#dde44c", orange:"#ff7c53", magenta:"#e7466d",
-  cerulean:"#217ebe", charcoal:"#707175", ink:"#1b1b1b" };
+// --- pmtiles protocol
+const protocol = new pmtiles.Protocol();
+maplibregl.addProtocol('pmtiles', protocol.tile);
 
-const CAT_COLOR = {
-  "Busiest overall":        VC.magenta,
-  "Weekday morning rush":   VC.orange,
-  "Weekday evening rush":   VC.cerulean,
-  "Weekend night peak":     "#7e4cc7",
-  "Weekend destination":    VC.chartreuse,
-  "Office-hours only":      "#2c8f6b",
-  "Outer-borough hotspot":  "#d9a441",
-};
+const PMTILES_URL = 'pmtiles://' + location.href.replace(/[^/]*$/, '') + 'pedflows.pmtiles';
 
-const DATA = /*__HIGHLIGHTS__*/[{"rank": 1, "lon": -73.991437, "lat": 40.749553, "category": "Busiest overall", "detail": "Peak 3398/hr — ranks #1 citywide", "am": 2842, "md": 1806, "pm": 3398, "wam": 231, "wmd": 730, "wpm": 722, "peak": 3398, "line": [[-73.99135, 40.7497], [-73.99144, 40.74955]], "road": "West 32nd Street", "hood": "Chelsea District", "boro": ""}, {"rank": 2, "lon": -73.983966, "lat": 40.754484, "category": "Busiest overall", "detail": "Peak 3225/hr — ranks #2 citywide", "am": 2221, "md": 2561, "pm": 3225, "wam": 170, "wmd": 859, "wpm": 848, "peak": 3225, "line": [[-73.98395, 40.75445], [-73.98395, 40.75445], [-73.98397, 40.75448], [-73.98397, 40.7545], [-73.98397, 40.7545]], "road": "West 42nd Street", "hood": "Manhattan Community Board 5", "boro": ""}, {"rank": 3, "lon": -73.977561, "lat": 40.753686, "category": "Busiest overall", "detail": "Peak 3064/hr — ranks #3 citywide", "am": 1853, "md": 2497, "pm": 3064, "wam": 123, "wmd": 504, "wpm": 717, "peak": 3064, "line": [[-73.97747, 40.7538], [-73.97756, 40.75369]], "road": "", "hood": "Manhattan Community Board 5", "boro": ""}, {"rank": 4, "lon": -73.989753, "lat": 40.757032, "category": "Weekday morning rush", "detail": "2537/hr on weekday mornings (8–10 a.m.)", "am": 2537, "md": 1544, "pm": 2713, "wam": 249, "wmd": 912, "wpm": 990, "peak": 2713, "line": [[-73.99008, 40.75659], [-73.98975, 40.75703], [-73.98972, 40.75707]], "road": "8th Avenue", "hood": "Garment District", "boro": ""}, {"rank": 5, "lon": -73.975902, "lat": 40.748989, "category": "Weekday morning rush", "detail": "2504/hr on weekday mornings (8–10 a.m.)", "am": 2504, "md": 1794, "pm": 2626, "wam": 261, "wmd": 850, "wpm": 867, "peak": 2626, "line": [[-73.97593, 40.74897], [-73.9759, 40.74899], [-73.97556, 40.74946]], "road": "East 39th Street", "hood": "Murray Hill", "boro": ""}, {"rank": 6, "lon": -73.980609, "lat": 40.759893, "category": "Weekday evening rush", "detail": "2928/hr on weekday evenings (5–7 p.m.)", "am": 1845, "md": 2013, "pm": 2928, "wam": 245, "wmd": 965, "wpm": 1077, "peak": 2928, "line": [[-73.98036, 40.75975], [-73.98061, 40.75989]], "road": "West 50th Street", "hood": "Theater District", "boro": ""}, {"rank": 7, "lon": -73.969469, "lat": 40.760283, "category": "Weekday evening rush", "detail": "2759/hr on weekday evenings (5–7 p.m.)", "am": 2382, "md": 1940, "pm": 2759, "wam": 246, "wmd": 901, "wpm": 852, "peak": 2759, "line": [[-73.9691, 40.76078], [-73.96915, 40.76073], [-73.96947, 40.76028], [-73.96947, 40.76025]], "road": "East 56th Street", "hood": "Midtown East", "boro": ""}, {"rank": 8, "lon": -74.005394, "lat": 40.727066, "category": "Weekend night peak", "detail": "2348/hr Saturday–Sunday evenings", "am": 815, "md": 1206, "pm": 1373, "wam": 357, "wmd": 1635, "wpm": 2348, "peak": 2348, "line": [[-74.00536, 40.7272], [-74.00539, 40.72707]], "road": "Charlton Street", "hood": "Hudson Square", "boro": ""}, {"rank": 9, "lon": -73.988096, "lat": 40.737796, "category": "Weekend night peak", "detail": "2234/hr Saturday–Sunday evenings", "am": 1003, "md": 1313, "pm": 1491, "wam": 440, "wmd": 1343, "wpm": 2234, "peak": 2234, "line": [[-73.98823, 40.73785], [-73.9881, 40.7378], [-73.98797, 40.73774]], "road": "Park Avenue South", "hood": "Union Square", "boro": ""}, {"rank": 10, "lon": -73.884781, "lat": 40.821516, "category": "Weekend destination", "detail": "2.6× busier on weekends than weekdays", "am": 64, "md": 74, "pm": 64, "wam": 142, "wmd": 168, "wpm": 224, "peak": 224, "line": [[-73.88479, 40.82149], [-73.88478, 40.82152], [-73.88516, 40.82244]], "road": "Garrison Avenue", "hood": "The Bronx", "boro": ""}, {"rank": 11, "lon": -73.837784, "lat": 40.865936, "category": "Weekend destination", "detail": "2.6× busier on weekends than weekdays", "am": 70, "md": 77, "pm": 54, "wam": 142, "wmd": 138, "wpm": 241, "peak": 241, "line": [[-73.83705, 40.86556], [-73.83778, 40.86594]], "road": "Tiemann Avenue", "hood": "The Bronx", "boro": ""}, {"rank": 12, "lon": -74.014758, "lat": 40.677528, "category": "Weekend destination", "detail": "2.6× busier on weekends than weekdays", "am": 71, "md": 77, "pm": 54, "wam": 143, "wmd": 137, "wpm": 242, "peak": 242, "line": [[-74.01368, 40.67679], [-74.01476, 40.67753]], "road": "Dikeman Street", "hood": "Red Hook", "boro": ""}, {"rank": 13, "lon": -74.010178, "lat": 40.703406, "category": "Office-hours only", "detail": "7.3× busier on weekdays — quiet weekends", "am": 1255, "md": 1291, "pm": 1533, "wam": 92, "wmd": 270, "wpm": 198, "peak": 1533, "line": [[-74.01022, 40.7034], [-74.01018, 40.70341], [-74.00967, 40.70375]], "road": "Water Street", "hood": "Financial District", "boro": ""}, {"rank": 14, "lon": -73.987276, "lat": 40.695026, "category": "Office-hours only", "detail": "5.2× busier on weekdays — quiet on weekends", "am": 1107, "md": 807, "pm": 871, "wam": 136, "wmd": 172, "wpm": 224, "peak": 1107, "line": [[-73.98729, 40.69488], [-73.98728, 40.69503]], "road": "Tech Place", "hood": "Downtown Brooklyn", "boro": ""}, {"rank": 15, "lon": -73.870355, "lat": 40.733845, "category": "Outer-borough hotspot", "detail": "Peak 1844/hr — top outside Manhattan", "am": 1263, "md": 1844, "pm": 1808, "wam": 259, "wmd": 874, "wpm": 1046, "peak": 1844, "line": [[-73.87019, 40.73385], [-73.87036, 40.73385], [-73.87045, 40.73386]], "road": "Queens Boulevard", "hood": "Queens", "boro": ""}, {"rank": 16, "lon": -73.828304, "lat": 40.760092, "category": "Outer-borough hotspot", "detail": "Peak 1722/hr — top outside Manhattan", "am": 1722, "md": 1405, "pm": 1575, "wam": 221, "wmd": 667, "wpm": 721, "peak": 1722, "line": [[-73.83004, 40.75967], [-73.83002, 40.75966], [-73.82914, 40.75988], [-73.82899, 40.75991], [-73.82846, 40.76004], [-73.8283, 40.76009], [-73.82786, 40.7602], [-73.82779, 40.76022], [-73.82674, 40.76048], [-73.82671, 40.7605]], "road": "Roosevelt Avenue", "hood": "Flushing Chinatown", "boro": ""}, {"rank": 17, "lon": -74.021663, "lat": 40.644727, "category": "Outer-borough hotspot", "detail": "Peak 1630/hr — top outside Manhattan", "am": 575, "md": 1630, "pm": 991, "wam": 194, "wmd": 516, "wpm": 737, "peak": 1630, "line": [[-74.02363, 40.64596], [-74.02362, 40.64591], [-74.02166, 40.64473], [-74.02161, 40.64471]], "road": "58th Street", "hood": "Sunset Park", "boro": ""}, {"rank": 18, "lon": -73.900834, "lat": 40.868329, "category": "Outer-borough hotspot", "detail": "Peak 1566/hr — top outside Manhattan", "am": 937, "md": 1264, "pm": 1487, "wam": 375, "wmd": 1045, "wpm": 1566, "peak": 1566, "line": [[-73.90086, 40.86836], [-73.90083, 40.86833], [-73.90004, 40.86814]], "road": "West Kingsbridge Road", "hood": "The Bronx", "boro": ""}];
+// brand palette
+const VC = { chartreuse:'#dde44c', orange:'#ff7c53', magenta:'#e7466d',
+  cerulean:'#217ebe', charcoal:'#707175', ink:'#1b1b1b', rule:'#e7e6df' };
 
-// Legend
-const legend = document.getElementById('legend');
-Object.entries(CAT_COLOR).forEach(([cat, col])=>{
-  const s = document.createElement('span');
-  s.className='chip';
-  s.innerHTML = `<span class="dot" style="background:${col}"></span>${cat}`;
-  legend.appendChild(s);
+const TOD_FIELD = (day, tod) => day==='wkdy'
+  ? {AM:'am', MD:'md', PM:'pm'}[tod]
+  : {AM:'wam', MD:'wmd', PM:'wpm'}[tod];
+
+let state = { day:'wkdy', tod:'AM' };
+
+const map = new maplibregl.Map({
+  container: 'map',
+  style: {
+    version: 8,
+    glyphs: 'https://basemaps.cartocdn.com/gl/positron-gl-style/{fontstack}/{range}.pbf',
+    sources: {
+      basemap: {
+        type: 'raster',
+        tiles: ['https://cartodb-basemaps-a.global.ssl.fastly.net/light_nolabels/{z}/{x}/{y}.png',
+                'https://cartodb-basemaps-b.global.ssl.fastly.net/light_nolabels/{z}/{x}/{y}.png',
+                'https://cartodb-basemaps-c.global.ssl.fastly.net/light_nolabels/{z}/{x}/{y}.png',
+                'https://cartodb-basemaps-d.global.ssl.fastly.net/light_nolabels/{z}/{x}/{y}.png'],
+        tileSize: 256,
+        attribution: '&copy; OpenStreetMap &copy; CARTO',
+      },
+      basemap_labels: {
+        type: 'raster',
+        tiles: ['https://cartodb-basemaps-a.global.ssl.fastly.net/light_only_labels/{z}/{x}/{y}.png',
+                'https://cartodb-basemaps-b.global.ssl.fastly.net/light_only_labels/{z}/{x}/{y}.png'],
+        tileSize: 256,
+      },
+      pedflows: { type: 'vector', url: PMTILES_URL, minzoom: 9, maxzoom: 15 },
+    },
+    layers: [
+      { id:'basemap', type:'raster', source:'basemap' },
+    ],
+  },
+  center:[-73.96, 40.735], zoom:11, minZoom:9, maxZoom:17,
+  attributionControl: { compact: true },
+});
+map.addControl(new maplibregl.NavigationControl({ showCompass:false }), 'top-right');
+
+map.on('load', () => {
+  // Pedestrian flow lines — volume-driven color + width
+  map.addLayer({
+    id: 'pedflows',
+    source: 'pedflows',
+    'source-layer': 'segs',
+    type: 'line',
+    layout: { 'line-cap':'round', 'line-join':'round' },
+    paint: buildPaint(state),
+  });
+  // labels on top
+  map.addLayer({ id:'basemap_labels', type:'raster', source:'basemap_labels' });
+
+  // hover readout
+  const readout = document.getElementById('readout');
+  map.on('mousemove', 'pedflows', (e)=>{
+    const f = e.features && e.features[0];
+    if (!f) return;
+    readout.classList.remove('hide');
+    const p = f.properties;
+    const v = p[TOD_FIELD(state.day, state.tod)];
+    readout.innerHTML = `
+      <div class="rl">${labelFor(state)}</div>
+      <div class="rv">${Number(v||0).toLocaleString()}<span style="font-size:12px;color:var(--charcoal);font-weight:700">/hr</span></div>
+      <div class="row"><span>Weekday AM</span><b>${(+p.am).toLocaleString()}</b></div>
+      <div class="row"><span>Weekday midday</span><b>${(+p.md).toLocaleString()}</b></div>
+      <div class="row"><span>Weekday PM</span><b>${(+p.pm).toLocaleString()}</b></div>
+      <div class="row"><span>Weekend AM</span><b>${(+p.wam).toLocaleString()}</b></div>
+      <div class="row"><span>Weekend midday</span><b>${(+p.wmd).toLocaleString()}</b></div>
+      <div class="row"><span>Weekend PM</span><b>${(+p.wpm).toLocaleString()}</b></div>`;
+  });
+  map.on('mouseleave', 'pedflows', ()=> readout.classList.add('hide'));
 });
 
-// Map
-const map = L.map('map', { scrollWheelZoom:false, zoomControl:true })
-  .setView([40.735, -73.96], 11);
-L.tileLayer('https://cartodb-basemaps-{s}.global.ssl.fastly.net/light_all/{z}/{x}/{y}.png', {
-  attribution:'&copy; <a href="https://openstreetmap.org">OpenStreetMap</a> &copy; <a href="https://carto.com/attributions">CARTO</a>',
-  subdomains:'abcd', maxZoom:19,
-}).addTo(map);
-
-const markers = {};
-
-function fmt(n){ return (Number(n)||0).toLocaleString(); }
-
-function popupHTML(d){
-  const color = CAT_COLOR[d.category] || VC.ink;
-  const maps = `https://www.google.com/maps/search/?api=1&query=${d.lat},${d.lon}`;
-  const addr = d.road || `${d.lat.toFixed(4)}, ${d.lon.toFixed(4)}`;
-  const hood = [d.hood, d.boro].filter(Boolean).join(' · ');
-  return `<div class="pop">
-    <div class="cat" style="color:${color}">#${d.rank} · ${d.category}</div>
-    <div class="addr">${addr}</div>
-    <div class="hood">${hood}</div>
-    <div class="big"><em>${d.detail}</em></div>
-    <div class="row"><span>Weekday AM (8–10a)</span><b>${fmt(d.am)}/hr</b></div>
-    <div class="row"><span>Weekday midday (12–2p)</span><b>${fmt(d.md)}/hr</b></div>
-    <div class="row"><span>Weekday PM (5–7p)</span><b>${fmt(d.pm)}/hr</b></div>
-    <div class="row"><span>Weekend AM</span><b>${fmt(d.wam)}/hr</b></div>
-    <div class="row"><span>Weekend midday</span><b>${fmt(d.wmd)}/hr</b></div>
-    <div class="row"><span>Weekend PM</span><b>${fmt(d.wpm)}/hr</b></div>
-    <a class="link" href="${maps}" target="_blank" rel="noopener">Open in Google Maps →</a>
-  </div>`;
+function buildPaint(st){
+  const f = TOD_FIELD(st.day, st.tod);
+  return {
+    'line-color': [
+      'interpolate', ['linear'], ['to-number', ['get', f]],
+      0,    '#e7e6df',
+      100,  '#d4d6a3',
+      300,  VC.chartreuse,
+      800,  VC.orange,
+      1800, VC.magenta,
+      3200, '#a61f48',
+    ],
+    'line-width': [
+      'interpolate', ['linear'], ['zoom'],
+      9,  ['interpolate',['linear'],['to-number',['get',f]], 0,0.2, 300,0.6, 1500,1.2, 3000,1.8],
+      12, ['interpolate',['linear'],['to-number',['get',f]], 0,0.6, 300,1.4, 1500,3, 3000,4.5],
+      15, ['interpolate',['linear'],['to-number',['get',f]], 0,1.4, 300,3, 1500,6, 3000,9],
+    ],
+    'line-opacity': ['interpolate',['linear'],['to-number',['get',f]], 0,0.25, 200,0.65, 800,0.9, 2000,1.0],
+  };
 }
 
-DATA.forEach(d=>{
-  const color = CAT_COLOR[d.category] || VC.ink;
-  // segment polyline
-  if (d.line && d.line.length>1){
-    L.polyline(d.line.map(c=>[c[1],c[0]]), {
-      color, weight:5, opacity:.85, lineCap:'round'
-    }).addTo(map);
-  }
-  const icon = L.divIcon({
-    className:'leaflet-div-icon',
-    html:`<div class="pin" style="background:${color}">${d.rank}</div>`,
-    iconSize:[30,30], iconAnchor:[15,15],
+function labelFor(st){
+  const day = st.day==='wkdy' ? 'Weekday' : 'Weekend';
+  const tod = { AM:'AM rush (8–10a)', MD:'Midday (12–2p)', PM:'PM rush (5–7p)' }[st.tod];
+  return `${day} · ${tod}`;
+}
+
+function setSeg(selId, value){
+  document.querySelectorAll('#'+selId+' button').forEach(b=>{
+    b.classList.toggle('on', b.dataset.v===value);
   });
-  const m = L.marker([d.lat, d.lon], { icon }).addTo(map);
-  m.bindPopup(popupHTML(d), { maxWidth:340 });
-  markers[d.rank] = m;
+}
+function applyState(){
+  if (map.getLayer('pedflows')) {
+    const paint = buildPaint(state);
+    Object.entries(paint).forEach(([k,v])=> map.setPaintProperty('pedflows', k, v));
+  }
+}
+document.getElementById('daySeg').addEventListener('click', e=>{
+  const b = e.target.closest('button'); if(!b) return;
+  state.day = b.dataset.v; setSeg('daySeg', state.day); applyState();
 });
-
-// List cards
-const list = document.getElementById('list');
-DATA.forEach(d=>{
-  const color = CAT_COLOR[d.category] || VC.ink;
-  const b = document.createElement('button');
-  b.className='card';
-  b.innerHTML = `
-    <div class="n"><span class="mini" style="background:${color}"></span>#${d.rank} · ${d.category}</div>
-    <div class="road">${d.road || d.detail}</div>
-    <div class="sub">${[d.hood, d.boro].filter(Boolean).join(' · ') || d.detail}</div>`;
-  b.onclick = ()=>{
-    map.setView([d.lat, d.lon], 16, { animate:true });
-    markers[d.rank].openPopup();
-    document.getElementById('map').scrollIntoView({behavior:'smooth', block:'center'});
-  };
-  list.appendChild(b);
+document.getElementById('todSeg').addEventListener('click', e=>{
+  const b = e.target.closest('button'); if(!b) return;
+  state.tod = b.dataset.v; setSeg('todSeg', state.tod); applyState();
 });
-
-// Fit to NYC on load
-map.fitBounds(L.latLngBounds(DATA.map(d=>[d.lat, d.lon])).pad(0.12));
 </script>
 </body>
 </html>
