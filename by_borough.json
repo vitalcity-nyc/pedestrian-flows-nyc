@@ -20,7 +20,8 @@
        40.58248
       ]
      ]
-    ]
+    ],
+    "label": "Staten Island"
    },
    {
     "peak_wkdyMD": 910,
@@ -183,7 +184,8 @@
        40.58535
       ]
      ]
-    ]
+    ],
+    "label": "Seaview Avenue, Staten Island"
    },
    {
     "peak_wkdyMD": 865,
@@ -204,7 +206,8 @@
        40.58334
       ]
      ]
-    ]
+    ],
+    "label": "Seaview Avenue, Staten Island"
    },
    {
     "peak_wkdyMD": 717,
@@ -229,7 +232,8 @@
        40.57514
       ]
      ]
-    ]
+    ],
+    "label": "Yukon Avenue, Staten Island"
    },
    {
     "peak_wkdyMD": 661,
@@ -392,7 +396,8 @@
        40.5864
       ]
      ]
-    ]
+    ],
+    "label": "Liberty Avenue, Dongan Hills"
    },
    {
     "peak_wkdyMD": 605,
@@ -461,7 +466,8 @@
        40.62502
       ]
      ]
-    ]
+    ],
+    "label": "Willow Road West, Graniteville"
    },
    {
     "peak_wkdyMD": 584,
@@ -486,7 +492,8 @@
        40.57284
       ]
      ]
-    ]
+    ],
+    "label": "New Dorp Lane, New Dorp"
    },
    {
     "peak_wkdyMD": 581,
@@ -545,7 +552,8 @@
        40.5703
       ]
      ]
-    ]
+    ],
+    "label": "Hylan Boulevard, Staten Island"
    },
    {
     "peak_wkdyMD": 564,
@@ -620,7 +628,8 @@
        40.61312
       ]
      ]
-    ]
+    ],
+    "label": "Victory Boulevard, Castleton Corners"
    },
    {
     "peak_wkdyMD": 518,
@@ -651,7 +660,8 @@
        40.63478
       ]
      ]
-    ]
+    ],
+    "label": "Castleton Avenue, West New Brighton"
    }
   ],
   "Queens": [
@@ -818,7 +828,8 @@
        40.73408
       ]
      ]
-    ]
+    ],
+    "label": "Queens Boulevard, Queens"
    },
    {
     "peak_wkdyMD": 1682,
@@ -961,7 +972,8 @@
        40.73454
       ]
      ]
-    ]
+    ],
+    "label": "Junction Boulevard, Rego Park"
    },
    {
     "peak_wkdyMD": 1503,
@@ -1108,7 +1120,8 @@
        40.7026
       ]
      ]
-    ]
+    ],
+    "label": "89th Avenue, Queens"
    },
    {
     "peak_wkdyMD": 1405,
@@ -1319,7 +1332,8 @@
        40.75863
       ]
      ]
-    ]
+    ],
+    "label": "Roosevelt Avenue, Flushing Chinatown"
    },
    {
     "peak_wkdyMD": 1387,
@@ -1398,7 +1412,8 @@
        40.76291
       ]
      ]
-    ]
+    ],
+    "label": "Northern Boulevard, Queens"
    },
    {
     "peak_wkdyMD": 1302,
@@ -1499,7 +1514,8 @@
        40.58458
       ]
      ]
-    ]
+    ],
+    "label": "Boardwalk, Rockaway Beach"
    },
    {
     "peak_wkdyMD": 1302,
@@ -1666,7 +1682,8 @@
        40.70385
       ]
      ]
-    ]
+    ],
+    "label": "Jamaica Avenue, Queens"
    },
    {
     "peak_wkdyMD": 1298,
@@ -1963,7 +1980,8 @@
        40.58557
       ]
      ]
-    ]
+    ],
+    "label": "Boardwalk, The Sands"
    },
    {
     "peak_wkdyMD": 1258,
@@ -2030,7 +2048,8 @@
        40.70551
       ]
      ]
-    ]
+    ],
+    "label": "165th Street, Queens"
    },
    {
     "peak_wkdyMD": 1252,
@@ -2067,7 +2086,8 @@
        40.74297
       ]
      ]
-    ]
+    ],
+    "label": "47th Avenue, Sunnyside"
    }
   ],
   "Brooklyn": [
@@ -2170,7 +2190,8 @@
        40.64618
       ]
      ]
-    ]
+    ],
+    "label": "58th Street, Sunset Park"
    },
    {
     "peak_wkdyMD": 1578,
@@ -2329,7 +2350,8 @@
        40.68988
       ]
      ]
-    ]
+    ],
+    "label": "Lawrence Street, Downtown Brooklyn"
    },
    {
     "peak_wkdyMD": 1442,
@@ -2484,7 +2506,8 @@
        40.69164
       ]
      ]
-    ]
+    ],
+    "label": "Joralemon Street, Brooklyn Heights"
    },
    {
     "peak_wkdyMD": 1276,
@@ -2559,7 +2582,8 @@
        40.62875
       ]
      ]
-    ]
+    ],
+    "label": "Bedford Avenue, Brooklyn"
    },
    {
     "peak_wkdyMD": 1201,
@@ -2686,7 +2710,8 @@
        40.70252
       ]
      ]
-    ]
+    ],
+    "label": "Front Street, Dumbo"
    },
    {
     "peak_wkdyMD": 1195,
@@ -2829,7 +2854,8 @@
        40.69503
       ]
      ]
-    ]
+    ],
+    "label": "Myrtle Avenue, Downtown Brooklyn"
    },
    {
     "peak_wkdyMD": 1181,
@@ -2954,7 +2980,8 @@
        40.68735
       ]
      ]
-    ]
+    ],
+    "label": "Smith Street, Boerum Hill"
    },
    {
     "peak_wkdyMD": 1170,
@@ -3009,7 +3036,8 @@
        40.6557
       ]
      ]
-    ]
+    ],
+    "label": "Clarkson Avenue, Brooklyn Community District 17"
    },
    {
     "peak_wkdyMD": 1161,
@@ -3098,7 +3126,8 @@
        40.69914
       ]
      ]
-    ]
+    ],
+    "label": "Broadway, Brooklyn"
    },
    {
     "peak_wkdyMD": 1150,
@@ -3175,7 +3204,8 @@
        40.65628
       ]
      ]
-    ]
+    ],
+    "label": "36th Street, Sunset Park"
    }
   ],
   "Manhattan": [
@@ -3344,7 +3374,8 @@
        40.75849
       ]
      ]
-    ]
+    ],
+    "label": "5th Avenue, Midtown East"
    },
    {
     "peak_wkdyMD": 2683,
@@ -3559,7 +3590,8 @@
        40.75292
       ]
      ]
-    ]
+    ],
+    "label": "West 40th Street, Manhattan Community Board 5"
    },
    {
     "peak_wkdyMD": 2620,
@@ -3710,7 +3742,8 @@
        40.75348
       ]
      ]
-    ]
+    ],
+    "label": "Madison Avenue, Manhattan Community Board 5"
    },
    {
     "peak_wkdyMD": 2363,
@@ -3885,7 +3918,8 @@
        40.7566
       ]
      ]
-    ]
+    ],
+    "label": "East 47th Street, Manhattan Community Board 5"
    },
    {
     "peak_wkdyMD": 2319,
@@ -4028,7 +4062,8 @@
        40.75889
       ]
      ]
-    ]
+    ],
+    "label": "Rockefeller Plaza, Manhattan Community Board 5"
    },
    {
     "peak_wkdyMD": 2298,
@@ -4183,7 +4218,8 @@
        40.75827
       ]
      ]
-    ]
+    ],
+    "label": "East 52nd Street, Midtown East"
    },
    {
     "peak_wkdyMD": 2206,
@@ -4342,7 +4378,8 @@
        40.75616
       ]
      ]
-    ]
+    ],
+    "label": "West 44th Street, Manhattan Community Board 5"
    },
    {
     "peak_wkdyMD": 2194,
@@ -4513,7 +4550,8 @@
        40.75588
       ]
      ]
-    ]
+    ],
+    "label": "7th Avenue, Manhattan Community Board 5"
    },
    {
     "peak_wkdyMD": 2163,
@@ -4692,7 +4730,8 @@
        40.75083
       ]
      ]
-    ]
+    ],
+    "label": "West 40th Street, Manhattan Community Board 5"
    },
    {
     "peak_wkdyMD": 2100,
@@ -4855,7 +4894,8 @@
        40.75281
       ]
      ]
-    ]
+    ],
+    "label": "East 42nd Street, Tudor City"
    }
   ],
   "Bronx": [
@@ -5016,7 +5056,8 @@
        40.81667
       ]
      ]
-    ]
+    ],
+    "label": "East 149th Street, The Bronx"
    },
    {
     "peak_wkdyMD": 1511,
@@ -5095,7 +5136,8 @@
        40.81794
       ]
      ]
-    ]
+    ],
+    "label": "Park Avenue, The Bronx"
    },
    {
     "peak_wkdyMD": 1480,
@@ -5116,7 +5158,8 @@
        40.88265
       ]
      ]
-    ]
+    ],
+    "label": "Jerome Avenue, The Bronx"
    },
    {
     "peak_wkdyMD": 1264,
@@ -5267,7 +5310,8 @@
        40.86795
       ]
      ]
-    ]
+    ],
+    "label": "West Kingsbridge Road, The Bronx"
    },
    {
     "peak_wkdyMD": 1261,
@@ -5296,7 +5340,8 @@
        40.85556
       ]
      ]
-    ]
+    ],
+    "label": "Lydig Avenue, Morris Park"
    },
    {
     "peak_wkdyMD": 1164,
@@ -5467,7 +5512,8 @@
        40.87901
       ]
      ]
-    ]
+    ],
+    "label": "Bainbridge Avenue, Norwood"
    },
    {
     "peak_wkdyMD": 1152,
@@ -5542,7 +5588,8 @@
        40.88067
       ]
      ]
-    ]
+    ],
+    "label": "East Mosholu Parkway North, The Bronx"
    },
    {
     "peak_wkdyMD": 1078,
@@ -5595,7 +5642,8 @@
        40.82109
       ]
      ]
-    ]
+    ],
+    "label": "Southern Boulevard, The Bronx"
    },
    {
     "peak_wkdyMD": 1023,
@@ -5754,7 +5802,8 @@
        40.86195
       ]
      ]
-    ]
+    ],
+    "label": "East Fordham Road, The Bronx"
    },
    {
     "peak_wkdyMD": 1001,
@@ -5787,7 +5836,8 @@
        40.81838
       ]
      ]
-    ]
+    ],
+    "label": "Grand Concourse, The Bronx"
    }
   ]
  },

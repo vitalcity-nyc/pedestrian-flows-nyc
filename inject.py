@@ -27,6 +27,9 @@ for b, cs in DATA['boroughs'].items():
     corridors['boroughs'][b] = [{
         "peak_wkdyMD": c['peak_wkdyMD'],
         "lon": c['lon'], "lat": c['lat'],
+        "label": c.get('label', ''),
+        "wkdyAM": c.get('wkdyAM'), "wkdyPM": c.get('wkdyPM'),
+        "wkndMD": c.get('wkndMD'), "wkndPM": c.get('wkndPM'),
         "lines": c.get('lines', [])[:15],
     } for c in cs[:10]]
 
