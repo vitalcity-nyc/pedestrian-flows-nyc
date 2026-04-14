@@ -392,37 +392,29 @@
  },
  {
   "rank": 14,
-  "lon": -73.811298,
-  "lat": 40.584386,
+  "lon": -73.987276,
+  "lat": 40.695026,
   "category": "Office-hours only",
-  "detail": "5.9\u00d7 busier on weekdays \u2014 quiet weekends",
-  "am": 463,
-  "md": 1296,
-  "pm": 615,
-  "wam": 87,
-  "wmd": 163,
-  "wpm": 155,
-  "peak": 1296,
+  "detail": "5.2\u00d7 busier on weekdays \u2014 quiet on weekends",
+  "am": 1107,
+  "md": 807,
+  "pm": 871,
+  "wam": 136,
+  "wmd": 172,
+  "wpm": 224,
+  "peak": 1107,
   "line": [
    [
-    -73.81103,
-    40.58445
+    -73.98729,
+    40.69488
    ],
    [
-    -73.81119,
-    40.58441
-   ],
-   [
-    -73.8113,
-    40.58439
-   ],
-   [
-    -73.81144,
-    40.58439
+    -73.98728,
+    40.69503
    ]
   ],
-  "road": "Boardwalk",
-  "hood": "Queens",
+  "road": "Tech Place",
+  "hood": "Downtown Brooklyn",
   "boro": ""
  },
  {
