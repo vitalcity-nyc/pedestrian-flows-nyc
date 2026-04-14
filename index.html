@@ -4,178 +4,311 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>How New York walks</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;700;900&family=DM+Serif+Display&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://use.typekit.net/qqk2vto.css">
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
 <style>
   :root{
-    --bg:#0f1419; --card:#151b21; --ink:#f6f7f4; --muted:#8a8f98;
+    --ink:#050507; --white:#ffffff; --cloud:#dddddd; --paper:#f5f5f2;
     --chartreuse:#dde44c; --orange:#ff7c53; --magenta:#e7466d;
-    --cerulean:#217ebe; --periwinkle:#9b9fbc; --rule:#2a3038;
+    --cerulean:#217ebe; --periwinkle:#9b9fbc; --indigo:#394882;
+    --charcoal:#707175; --rose:#cea9be; --rule:#e3e3de;
   }
-  *{box-sizing:border-box}
+  *{box-sizing:border-box;-webkit-font-smoothing:antialiased;
+    -moz-osx-font-smoothing:grayscale;}
   html,body{margin:0;padding:0;background:transparent;color:var(--ink);
-    font-family:'DM Sans',system-ui,sans-serif;}
-  .wrap{max-width:700px;margin:0 auto;padding:16px 0;}
-  .card{background:var(--bg);border-radius:12px;overflow:hidden;
-    box-shadow:0 6px 28px rgba(0,0,0,.15);}
-  .pad{padding:28px 28px;}
-  .kicker{font-size:11px;letter-spacing:.18em;text-transform:uppercase;
-    color:var(--chartreuse);font-weight:700;margin-bottom:14px;}
-  h1{font-family:'DM Serif Display',Georgia,serif;font-weight:400;
-    font-size:34px;line-height:1.12;margin:0 0 10px;letter-spacing:-.01em;}
-  h2{font-family:'DM Sans',sans-serif;font-weight:900;font-size:18px;
-    margin:0 0 6px;letter-spacing:-.005em;}
-  .dek{color:var(--muted);font-size:15px;line-height:1.5;margin:0 0 4px;font-weight:300;}
-  .subdek{color:var(--muted);font-size:13px;line-height:1.45;margin:0 0 18px;font-weight:300;}
-  .rule{height:1px;background:var(--rule);margin:24px 0;}
-  .section{padding:22px 28px;}
-  .big{font-family:'DM Serif Display',serif;font-size:56px;line-height:1;
-    color:var(--chartreuse);margin:4px 0 4px;}
-  .big-small{font-size:13px;color:var(--muted);letter-spacing:.05em;
-    text-transform:uppercase;font-weight:700;}
-  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:20px;}
-  .stat{border-left:2px solid var(--chartreuse);padding:4px 0 4px 14px;}
-  .stat .n{font-family:'DM Serif Display',serif;font-size:30px;line-height:1;}
-  .stat .l{font-size:12px;color:var(--muted);margin-top:4px;line-height:1.35;}
-  canvas{max-width:100%;}
-  .chart-box{position:relative;width:100%;}
-  .chart-time{height:240px;}
-  .chart-od{height:300px;}
-  .annotation{font-size:12px;color:var(--muted);margin-top:10px;line-height:1.45;}
-  .annotation b{color:var(--ink);font-weight:700;}
+    font-family:"halyard-text","Inter","Helvetica Neue",Arial,sans-serif;
+    font-weight:300;}
+  .frame{max-width:700px;margin:0 auto;padding:12px 0;position:relative;}
+
+  /* deck */
+  .deck{display:flex;overflow-x:auto;scroll-snap-type:x mandatory;
+    gap:0;scrollbar-width:none;-ms-overflow-style:none;
+    border-radius:14px;background:var(--white);
+    box-shadow:0 1px 0 var(--rule), 0 12px 38px rgba(5,5,7,.08);}
+  .deck::-webkit-scrollbar{display:none;}
+  .slide{flex:0 0 100%;scroll-snap-align:start;padding:34px 34px 30px;
+    min-height:620px;display:flex;flex-direction:column;position:relative;}
+  .slide + .slide{border-left:1px solid var(--rule);}
+
+  /* typography */
+  .eyebrow{font-weight:700;font-size:11px;letter-spacing:.18em;
+    text-transform:uppercase;color:var(--ink);margin:0 0 20px;}
+  .eyebrow .sep{color:var(--orange);margin:0 6px;}
+  h1.title{font-weight:900;font-size:40px;line-height:1.02;letter-spacing:-.015em;
+    margin:0 0 14px;}
+  h2.chead{font-weight:900;font-size:22px;line-height:1.15;letter-spacing:-.008em;
+    margin:0 0 6px;}
+  .dek{font-weight:200;font-size:15px;line-height:1.5;color:var(--charcoal);
+    margin:0 0 18px;}
+  .lede{font-weight:300;font-size:17px;line-height:1.55;color:var(--ink);
+    margin:0 0 8px;}
+  .note{font-weight:300;font-size:13.5px;line-height:1.55;color:var(--ink);
+    margin-top:14px;}
+  .note b{font-weight:700;}
   .hl{color:var(--orange);font-weight:700;}
-  .map-wrap{position:relative;width:100%;aspect-ratio:1.4/1;background:#0a0d11;
-    border-radius:8px;overflow:hidden;margin-top:8px;}
+  .hl-mag{color:var(--magenta);font-weight:700;}
+
+  /* chart */
+  .chart-box{position:relative;width:100%;margin:auto 0;}
+  .chart-time{height:260px;}
+  .chart-od{height:320px;}
+  .chart-boro{height:230px;}
+
+  /* numbers */
+  .bignum{font-weight:900;font-size:76px;line-height:.95;letter-spacing:-.025em;}
+  .bignum .unit{font-size:32px;margin-left:4px;letter-spacing:-.01em;}
+  .statline{display:flex;gap:28px;flex-wrap:wrap;margin-top:8px;}
+  .stat{flex:1 1 140px;border-top:2px solid var(--ink);padding-top:10px;}
+  .stat .n{font-weight:900;font-size:26px;line-height:1;letter-spacing:-.01em;}
+  .stat .l{font-weight:300;font-size:12.5px;color:var(--charcoal);
+    margin-top:6px;line-height:1.4;}
+
+  /* borough tabs */
+  .tabs{display:flex;gap:2px;margin:4px 0 14px;flex-wrap:wrap;}
+  .tab{font-family:inherit;font-weight:700;font-size:11px;letter-spacing:.08em;
+    text-transform:uppercase;padding:8px 11px;border:1px solid var(--rule);
+    background:var(--white);color:var(--charcoal);cursor:pointer;
+    border-radius:2px;transition:all .12s;}
+  .tab.active{background:var(--ink);color:var(--white);border-color:var(--ink);}
+  .tab:hover:not(.active){border-color:var(--ink);color:var(--ink);}
+
+  /* map */
+  .map-wrap{position:relative;width:100%;aspect-ratio:1.25/1;
+    background:var(--paper);border-radius:4px;overflow:hidden;
+    border:1px solid var(--rule);}
   .map-wrap svg{width:100%;height:100%;display:block;}
-  .legend{display:flex;gap:14px;flex-wrap:wrap;margin-top:10px;font-size:12px;color:var(--muted);}
-  .sw{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:6px;vertical-align:middle;}
-  footer{padding:18px 28px 24px;font-size:11px;color:var(--muted);
-    line-height:1.6;border-top:1px solid var(--rule);}
-  footer a{color:var(--muted);text-decoration:underline;}
-  .brand{display:flex;justify-content:space-between;align-items:center;gap:10px;}
-  .vc{font-family:'DM Sans',sans-serif;font-weight:900;letter-spacing:.14em;
-    font-size:11px;color:var(--ink);}
-  @media(max-width:520px){
-    .pad,.section,footer{padding-left:20px;padding-right:20px;}
-    h1{font-size:28px;} .big{font-size:44px;} .grid2{grid-template-columns:1fr;}
+
+  /* legend */
+  .legend{display:flex;gap:16px;flex-wrap:wrap;margin-top:10px;
+    font-size:12px;color:var(--charcoal);font-weight:300;}
+  .sw{display:inline-block;width:10px;height:10px;border-radius:50%;
+    margin-right:6px;vertical-align:middle;}
+
+  /* nav */
+  .nav{display:flex;align-items:center;justify-content:space-between;
+    padding:12px 6px 2px;}
+  .dots{display:flex;gap:8px;}
+  .dot{width:7px;height:7px;border-radius:50%;background:var(--cloud);
+    cursor:pointer;border:0;padding:0;transition:all .15s;}
+  .dot.active{background:var(--ink);width:22px;border-radius:4px;}
+  .arrows button{border:1px solid var(--rule);background:var(--white);
+    width:36px;height:36px;border-radius:50%;cursor:pointer;font-size:16px;
+    color:var(--ink);margin-left:6px;transition:all .12s;
+    display:inline-flex;align-items:center;justify-content:center;}
+  .arrows button:hover{border-color:var(--ink);}
+  .arrows button:disabled{opacity:.3;cursor:not-allowed;}
+
+  /* footer */
+  .foot{padding:14px 8px 6px;font-weight:300;font-size:11.5px;color:var(--charcoal);
+    line-height:1.55;}
+  .foot a{color:var(--charcoal);text-decoration:underline;}
+
+  /* slide count */
+  .counter{position:absolute;top:34px;right:34px;font-weight:700;
+    font-size:11px;letter-spacing:.12em;color:var(--charcoal);}
+
+  /* tall slide variants */
+  .slide .body{flex:1;display:flex;flex-direction:column;}
+
+  /* bar viz inline for borough weekend flip */
+  .boroRow{display:grid;grid-template-columns:110px 1fr 54px;align-items:center;
+    gap:12px;margin:8px 0;font-size:13px;}
+  .boroRow .name{font-weight:700;}
+  .boroRow .track{height:18px;background:var(--paper);position:relative;border-radius:2px;
+    overflow:hidden;border:1px solid var(--rule);}
+  .boroRow .fill{height:100%;background:var(--chartreuse);}
+  .boroRow.negative .fill{background:var(--magenta);}
+  .boroRow .val{font-weight:700;font-size:13px;text-align:right;}
+  .boroRow .val.neg{color:var(--magenta);}
+  .boroRow .val.pos{color:var(--ink);}
+
+  @media(max-width:540px){
+    .slide{padding:24px 22px;min-height:600px;}
+    h1.title{font-size:30px;} .bignum{font-size:58px;}
+    .counter{top:24px;right:22px;}
   }
 </style>
 </head>
 <body>
-<div class="wrap"><div class="card">
+<div class="frame">
 
-  <div class="pad">
-    <div class="kicker">Pedestrian flows / New York City</div>
-    <h1>How New York walks</h1>
-    <p class="dek">A block-by-block model of foot traffic across 315,577 sidewalk segments reveals a
-      city whose busiest hours are not the ones you'd expect.</p>
-  </div>
+<div class="deck" id="deck">
 
-  <div class="section">
-    <h2>The peak hour isn't rush hour</h2>
-    <p class="subdek">Estimated pedestrians on NYC sidewalks, summed across the five boroughs
-      (millions of segment-hours)</p>
+  <!-- SLIDE 1: COVER -->
+  <section class="slide" data-title="Intro">
+    <div class="counter">01 / 06</div>
+    <p class="eyebrow">Pedestrian flows<span class="sep">/</span>New York City</p>
+    <h1 class="title">How New York<br/>walks.</h1>
+    <p class="lede">A block-by-block model of foot traffic
+      across <b>315,577 sidewalk segments</b> reveals the rhythms of a city whose
+      busiest hour is not the one you'd expect — and whose
+      busiest blocks almost all sit inside a single square mile of Midtown.</p>
+    <div style="margin-top:auto">
+      <p class="dek" style="margin-bottom:6px">Swipe through to explore →</p>
+      <div class="statline">
+        <div class="stat"><div class="n">315,577</div>
+          <div class="l">sidewalk &amp; crosswalk segments modeled citywide</div></div>
+        <div class="stat"><div class="n">1,011</div>
+          <div class="l">locations where pedestrians were manually counted
+            to calibrate the model</div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SLIDE 2: TIME OF DAY -->
+  <section class="slide" data-title="Time">
+    <div class="counter">02 / 06</div>
+    <p class="eyebrow">When New York walks</p>
+    <h2 class="chead">Saturday evening, not rush hour, is the city's peak walking hour.</h2>
+    <p class="dek">Estimated pedestrians on NYC sidewalks, summed citywide (millions of segment-hours)</p>
     <div class="chart-box chart-time"><canvas id="timeBars"></canvas></div>
-    <p class="annotation">
-      <b>Saturday evening is New York's busiest walking hour</b> — an estimated
-      <span class="hl">73.8 million</span> pedestrian-segments between 5 and 6 p.m., roughly
-      <span class="hl">27% more</span> than the weekday evening commute. Weekend mornings are the
-      quietest stretch the model captures.
-    </p>
-  </div>
+    <p class="note">At an estimated <span class="hl">73.8 million</span> pedestrian-segments
+      between 5 and 6 p.m. Saturday, weekend evenings carry roughly
+      <b>27% more foot traffic</b> than the weekday evening commute.
+      Weekend mornings are the quietest stretch the model captures.</p>
+  </section>
 
-  <div class="rule" style="margin:0 28px"></div>
-
-  <div class="section">
-    <h2>Where New Yorkers walk to</h2>
-    <p class="subdek">Share of estimated pedestrian volume by journey type. Commuting home from work
-      narrowly leads — but trips to parks and neighborhood amenities nearly match it.</p>
+  <!-- SLIDE 3: O-D -->
+  <section class="slide" data-title="Why">
+    <div class="counter">03 / 06</div>
+    <p class="eyebrow">Why New Yorkers walk</p>
+    <h2 class="chead">Commuting home leads, but trips to parks and amenities nearly tie.</h2>
+    <p class="dek">Estimated share of pedestrian volume by journey type (millions of trip-segments)</p>
     <div class="chart-box chart-od"><canvas id="odBars"></canvas></div>
-    <p class="annotation">Home-to-job trips account for roughly
-      <b>20% of all modeled foot traffic.</b> Trips to parks (19%) and to restaurants, shops and
-      services (19%) together <b>outweigh every commute category combined.</b></p>
-  </div>
+    <p class="note">Home-to-work trips are the single largest category — but
+      <b>home-to-parks</b> and <b>home-to-amenities</b> (shops, restaurants, services)
+      together outweigh every work-related trip type combined.</p>
+  </section>
 
-  <div class="rule" style="margin:0 28px"></div>
+  <!-- SLIDE 4: BOROUGH FLIP -->
+  <section class="slide" data-title="Boroughs">
+    <div class="counter">04 / 06</div>
+    <p class="eyebrow">The weekend flip</p>
+    <h2 class="chead">Four boroughs walk more on weekends. Manhattan walks less.</h2>
+    <p class="dek">Change in estimated evening pedestrian volume, weekday 5-6 p.m. → weekend 5-6 p.m.</p>
+    <div id="boroBars" style="margin-top:18px"></div>
+    <p class="note">The outer boroughs' sidewalks fill up on Saturday nights — Staten Island's
+      evening foot traffic <b>nearly doubles</b>. Only Manhattan sees pedestrians
+      <span class="hl-mag">thin out</span>, as the office-district and transit-hub
+      crowds that define its weekday rush disappear.</p>
+  </section>
 
-  <div class="section">
-    <h2>The busiest sidewalks in the city are all within 10 blocks</h2>
-    <p class="subdek">Location of the 50 highest-volume sidewalk segments at weekday midday.
-      Every one sits inside a half-square-mile of Midtown Manhattan.</p>
-    <div class="map-wrap"><svg viewBox="0 0 700 500" id="map"></svg></div>
-    <div class="legend">
-      <span><span class="sw" style="background:var(--orange)"></span>Top 50 segments (~2,400+ pedestrians/hr)</span>
-      <span><span class="sw" style="background:var(--periwinkle);opacity:.6"></span>Manhattan outline</span>
-    </div>
-    <p class="annotation">The busiest modeled block in the city runs along <b>7th Avenue near
-      West 49th Street</b>, with an estimated 2,800 pedestrians passing every midday hour.
-      Of 315,577 segments citywide, only <b>12</b> exceed 2,500 pedestrians per hour.</p>
-  </div>
+  <!-- SLIDE 5: BUSIEST CORRIDORS -->
+  <section class="slide" data-title="Corridors">
+    <div class="counter">05 / 06</div>
+    <p class="eyebrow">Busiest corridors</p>
+    <h2 class="chead" id="boroHead">The 10 busiest walking corridors, by borough.</h2>
+    <p class="dek">Peak weekday midday pedestrians per hour on the 10 highest-volume modeled segments in each borough</p>
+    <div class="tabs" id="boroTabs"></div>
+    <div class="map-wrap"><svg viewBox="0 0 700 520" id="map"></svg></div>
+    <div class="legend" id="boroLegend"></div>
+    <p class="note" id="boroNote"></p>
+  </section>
 
-  <div class="rule" style="margin:0 28px"></div>
-
-  <div class="section">
-    <h2>By the numbers</h2>
-    <div class="grid2" style="margin-top:10px">
+  <!-- SLIDE 6: METHOD / NUMBERS -->
+  <section class="slide" data-title="Method">
+    <div class="counter">06 / 06</div>
+    <p class="eyebrow">By the numbers</p>
+    <h2 class="chead">A citywide pedestrian network, calibrated from 1,011 field counts.</h2>
+    <p class="dek">The model estimates pedestrian volumes at six time slots on every sidewalk
+      and crosswalk segment in the five boroughs.</p>
+    <div class="statline" style="margin-top:12px">
       <div class="stat"><div class="n">315,577</div>
-        <div class="l">sidewalk and crosswalk segments modeled citywide</div></div>
+        <div class="l">segments citywide</div></div>
       <div class="stat"><div class="n">1,011</div>
-        <div class="l">locations where pedestrians were actually counted to calibrate the model</div></div>
-      <div class="stat"><div class="n">0.3%</div>
-        <div class="l">share of sidewalks that carry more than 1,000 pedestrians per midday hour</div></div>
+        <div class="l">human-counted calibration sites</div></div>
       <div class="stat"><div class="n">73.8M</div>
-        <div class="l">estimated pedestrian-segments in a single Saturday-evening hour</div></div>
+        <div class="l">pedestrian-segments on a Saturday-evening hour</div></div>
+      <div class="stat"><div class="n">12</div>
+        <div class="l">segments citywide exceed 2,500 pedestrians per midday hour — all in Midtown Manhattan</div></div>
     </div>
-  </div>
+    <p class="note" style="margin-top:auto">
+      <b>About this model.</b> MIT City Form Lab built the network from NYC's LION planimetric
+      sidewalk layer, added missing park paths, and validated every segment against
+      2019 aerial imagery. Pedestrian volumes for six weekday and weekend time slots
+      were estimated using a calibrated spatial model of home-to-destination trips.
+      Journey-type breakdowns (home-to-job, home-to-parks, etc.) use uncalibrated
+      O-D estimates; absolute values can differ from observed volumes, but relative
+      spatial patterns are meaningful.</p>
+  </section>
 
-  <footer>
-    <div class="brand">
-      <div>Source: Sevtsuk, Basu, Liu &amp; Kollar (2025), "Spatial Distribution of Foot-traffic
-        in New York City," <i>Nature Cities</i>. Pedestrian estimates from the MIT City Form Lab
-        network, calibrated on 2018-2019 counts. Journey-type shares use uncalibrated
-        origin-destination estimates. Analysis by Vital City.</div>
-      <div class="vc">VITAL&nbsp;CITY</div>
-    </div>
-  </footer>
-</div></div>
+</div>
+
+<div class="nav">
+  <div class="dots" id="dots"></div>
+  <div class="arrows">
+    <button id="prev" aria-label="Previous">←</button>
+    <button id="next" aria-label="Next">→</button>
+  </div>
+</div>
+
+<p class="foot">
+  Source: Sevtsuk, Basu, Liu &amp; Kollar (2025), "Spatial Distribution of Foot-traffic in
+  New York City and Applications for Urban Planning," <i>Nature Cities</i>. Pedestrian
+  estimates from the MIT City Form Lab network, calibrated on 2018-2019 counts. Journey-type
+  shares use uncalibrated origin-destination estimates. Borough boundaries from NYC Open Data.
+  Analysis by Vital City.
+</p>
+
+</div>
 
 <script>
 const VC = {
+  ink:'#050507', white:'#ffffff', cloud:'#dddddd', paper:'#f5f5f2',
   chartreuse:'#dde44c', orange:'#ff7c53', magenta:'#e7466d',
-  cerulean:'#217ebe', periwinkle:'#9b9fbc', rose:'#cea9be',
-  indigo:'#394882', charcoal:'#8a8f98', ink:'#f6f7f4', rule:'#2a3038'
+  cerulean:'#217ebe', periwinkle:'#9b9fbc', indigo:'#394882',
+  charcoal:'#707175', rose:'#cea9be', rule:'#e3e3de'
 };
 
-Chart.defaults.font.family = "'DM Sans', system-ui, sans-serif";
-Chart.defaults.color = VC.charcoal;
+Chart.defaults.font.family = '"halyard-text","Inter","Helvetica Neue",Arial,sans-serif';
+Chart.defaults.font.weight = '300';
+Chart.defaults.color = VC.ink;
+Chart.defaults.devicePixelRatio = window.devicePixelRatio || 2;
 
-// --- 1. Time-of-day bars ---
+// --- TIME BARS ---
+const timeLabels = {id:'time-labels', afterDatasetsDraw(c){
+  const ctx=c.ctx;ctx.save();
+  ctx.font='700 11px halyard-text,Inter,sans-serif';
+  ctx.textAlign='center';
+  c.getDatasetMeta(0).data.forEach((bar,i)=>{
+    const v = c.data.datasets[0].data[i];
+    ctx.fillStyle = i===5? VC.orange : VC.ink;
+    ctx.fillText(v.toFixed(1)+'M', bar.x, bar.y-8);
+  });
+  ctx.restore();
+}};
 new Chart(document.getElementById('timeBars'), {
   type:'bar',
+  plugins:[timeLabels],
   data:{
-    labels:['Wkdy 8-9a','Wkdy 12:30-1:30p','Wkdy 5-6p',
-            'Wknd 8-9a','Wknd 12:30-1:30p','Wknd 5-6p'],
+    labels:['Wkdy\n8-9am','Wkdy\n12:30-1:30pm','Wkdy\n5-6pm',
+            'Wknd\n8-9am','Wknd\n12:30-1:30pm','Wknd\n5-6pm'],
     datasets:[{
       data:[49.3,51.8,58.1,40.4,52.3,73.8],
-      backgroundColor:(ctx)=> ctx.dataIndex===5 ? VC.orange : VC.chartreuse,
-      borderRadius:3, borderSkipped:false,
+      backgroundColor:(c)=> c.dataIndex===5 ? VC.orange : VC.chartreuse,
+      borderWidth:0,
     }]
   },
   options:{
     responsive:true, maintainAspectRatio:false, animation:false,
-    plugins:{ legend:{display:false},
-      tooltip:{callbacks:{label:(c)=>c.parsed.y+'M pedestrian-segments'}}},
+    layout:{padding:{top:24}},
+    plugins:{legend:{display:false},
+      tooltip:{callbacks:{label:(c)=>c.parsed.y.toFixed(1)+'M pedestrian-segments'}},
+      datalabels:false
+    },
     scales:{
-      x:{grid:{display:false},ticks:{color:VC.charcoal,font:{size:11}}},
-      y:{grid:{color:VC.rule},ticks:{color:VC.charcoal,callback:v=>v+'M'},
-         beginAtZero:true}
+      x:{grid:{display:false,drawBorder:false},border:{color:VC.ink},
+        ticks:{color:VC.ink,font:{size:11,weight:'700'},
+          callback:function(v){ return this.getLabelForValue(v).split('\n'); }}},
+      y:{grid:{color:VC.rule,drawBorder:false},border:{display:false},
+        ticks:{color:VC.charcoal,font:{size:10,weight:'300'},
+          callback:v=>v+'M'},
+        beginAtZero:true, max:80}
     }
   }
 });
 
-// --- 2. O-D journey bars ---
+// --- OD BARS ---
 const od = [
   ['Home → job',          105.0],
   ['Home → parks',        101.0],
@@ -187,102 +320,224 @@ const od = [
   ['Amenity → amenity',     1.1],
   ['Amenity → subway',      0.8],
 ];
+const odLabels = {id:'od-labels', afterDatasetsDraw(c){
+  const ctx=c.ctx;ctx.save();
+  ctx.font='700 11px halyard-text,Inter,sans-serif';
+  ctx.textAlign='left'; ctx.textBaseline='middle';
+  c.getDatasetMeta(0).data.forEach((bar,i)=>{
+    const v = c.data.datasets[0].data[i];
+    ctx.fillStyle = i===0? VC.orange : VC.ink;
+    ctx.fillText(v.toFixed(1)+'M', bar.x+6, bar.y);
+  });
+  ctx.restore();
+}};
 new Chart(document.getElementById('odBars'),{
   type:'bar',
+  plugins:[odLabels],
   data:{ labels:od.map(r=>r[0]),
     datasets:[{data:od.map(r=>r[1]),
-      backgroundColor:od.map((_,i)=> i===0 ? VC.orange : VC.chartreuse),
-      borderRadius:3, borderSkipped:false }]},
+      backgroundColor: od.map((_,i)=> i===0 ? VC.orange : VC.chartreuse),
+      borderWidth:0 }]},
   options:{
     indexAxis:'y', responsive:true, maintainAspectRatio:false, animation:false,
+    layout:{padding:{right:40}},
     plugins:{legend:{display:false},
-      tooltip:{callbacks:{label:(c)=>c.parsed.x+'M trip-segments'}}},
+      tooltip:{callbacks:{label:(c)=>c.parsed.x.toFixed(1)+'M'}}},
     scales:{
-      x:{grid:{color:VC.rule},ticks:{color:VC.charcoal,callback:v=>v+'M'},
-         beginAtZero:true},
-      y:{grid:{display:false},ticks:{color:VC.ink,font:{size:12,weight:'500'}}}
+      x:{grid:{color:VC.rule,drawBorder:false},border:{display:false},
+        ticks:{color:VC.charcoal,font:{size:10,weight:'300'},
+          callback:v=>v+'M'},beginAtZero:true,max:120},
+      y:{grid:{display:false,drawBorder:false},border:{display:false},
+        ticks:{color:VC.ink,font:{size:12.5,weight:'500'}}}
     }
   }
 });
 
-// --- 3. Midtown map: top 50 ---
-const TOP = [
-  [-73.97643,40.75974],[-73.98486,40.75356],[-73.98392,40.75444],[-73.97874,40.75334],
-  [-73.98242,40.75421],[-73.98388,40.75442],[-73.98397,40.75448],[-73.97784,40.75458],
-  [-73.97504,40.75837],[-73.97553,40.75775],[-73.98448,40.75409],[-73.98418,40.75498],
-  [-73.97696,40.75422],[-73.98522,40.75352],[-73.97756,40.75369],[-73.97740,40.75361],
-  [-73.97756,40.75369],[-73.97542,40.75786],[-73.97777,40.75802],[-73.97816,40.75257],
-  [-73.97818,40.75410],[-73.97862,40.75348],[-73.97461,40.75899],[-73.98478,40.75415],
-  [-73.97884,40.75358],[-73.98478,40.75417],[-73.97747,40.75380],[-73.98416,40.75411],
-  [-73.97862,40.75348],[-73.98530,40.75296],[-73.97894,40.75346],[-73.98388,40.75447],
-  [-73.97420,40.75957],[-73.97478,40.75922],[-73.97758,40.75531],[-73.97849,40.75409],
-  [-73.97525,40.75859],[-73.97803,40.75468],[-73.97803,40.75471],[-73.97529,40.75846],
-  [-73.98020,40.75414],[-73.97872,40.75336],[-73.97614,40.75980],[-73.97497,40.75849],
-  [-73.98008,40.75475],[-73.98398,40.75441],[-73.97691,40.75585],[-73.98486,40.75356],
-  [-73.97777,40.75304],[-73.97729,40.75861]
+// --- BOROUGH FLIP BARS (custom HTML) ---
+const boroFlip = [
+  {name:'Staten Island', wkdy:3.43, wknd:6.69},
+  {name:'Queens',        wkdy:14.24, wknd:23.29},
+  {name:'Brooklyn',      wkdy:14.83, wknd:19.32},
+  {name:'Bronx',         wkdy:7.43,  wknd:9.38},
+  {name:'Manhattan',     wkdy:18.13, wknd:15.09},
 ];
-// simple equirectangular projection zoomed on Midtown
-const svg = document.getElementById('map');
+(function(){
+  const host = document.getElementById('boroBars');
+  boroFlip.forEach(b=>{
+    const pct = Math.round((b.wknd - b.wkdy)/b.wkdy*100);
+    const absMax = 110; // percent scale — max is SI's ~95%
+    const row = document.createElement('div');
+    row.className = 'boroRow' + (pct<0 ? ' negative':'');
+    row.innerHTML = `
+      <div class="name">${b.name}</div>
+      <div class="track"><div class="fill" style="width:${Math.min(Math.abs(pct)/absMax*100,100)}%"></div></div>
+      <div class="val ${pct<0?'neg':'pos'}">${pct>0?'+':''}${pct}%</div>
+    `;
+    host.appendChild(row);
+  });
+})();
+
+// --- BOROUGH MAP ---
+const BORO_DATA = {"boroughs": {"Staten Island": [{"peak_wkdyMD": 936, "lon": -74.16763, "lat": 40.58248, "wkdyAM": 145, "wkdyPM": 319, "wkndMD": 509, "wkndPM": 393}, {"peak_wkdyMD": 910, "lon": -74.08813, "lat": 40.58475, "wkdyAM": 114, "wkdyPM": 139, "wkndMD": 136, "wkndPM": 211}, {"peak_wkdyMD": 865, "lon": -74.08545, "lat": 40.58334, "wkdyAM": 106, "wkdyPM": 128, "wkndMD": 109, "wkndPM": 203}, {"peak_wkdyMD": 717, "lon": -74.16944, "lat": 40.57699, "wkdyAM": 159, "wkdyPM": 354, "wkndMD": 613, "wkndPM": 404}, {"peak_wkdyMD": 661, "lon": -74.09243, "lat": 40.58592, "wkdyAM": 157, "wkdyPM": 349, "wkndMD": 578, "wkndPM": 401}, {"peak_wkdyMD": 605, "lon": -74.14768, "lat": 40.62296, "wkdyAM": 136, "wkdyPM": 287, "wkndMD": 561, "wkndPM": 243}, {"peak_wkdyMD": 584, "lon": -74.11615, "lat": 40.57395, "wkdyAM": 111, "wkdyPM": 243, "wkndMD": 739, "wkndPM": 430}, {"peak_wkdyMD": 581, "lon": -74.10984, "lat": 40.57061, "wkdyAM": 118, "wkdyPM": 251, "wkndMD": 702, "wkndPM": 414}, {"peak_wkdyMD": 564, "lon": -74.12263, "lat": 40.613, "wkdyAM": 117, "wkdyPM": 244, "wkndMD": 697, "wkndPM": 410}, {"peak_wkdyMD": 518, "lon": -74.10662, "lat": 40.63476, "wkdyAM": 121, "wkdyPM": 131, "wkndMD": 119, "wkndPM": 195}], "Queens": [{"peak_wkdyMD": 1844, "lon": -73.87035, "lat": 40.73384, "wkdyAM": 1263, "wkdyPM": 1808, "wkndMD": 874, "wkndPM": 1046}, {"peak_wkdyMD": 1682, "lon": -73.86375, "lat": 40.73283, "wkdyAM": 833, "wkdyPM": 1213, "wkndMD": 900, "wkndPM": 1218}, {"peak_wkdyMD": 1503, "lon": -73.81636, "lat": 40.70132, "wkdyAM": 638, "wkdyPM": 807, "wkndMD": 180, "wkndPM": 392}, {"peak_wkdyMD": 1405, "lon": -73.8283, "lat": 40.76009, "wkdyAM": 1722, "wkdyPM": 1575, "wkndMD": 667, "wkndPM": 721}, {"peak_wkdyMD": 1387, "lon": -73.83722, "lat": 40.76279, "wkdyAM": 470, "wkdyPM": 675, "wkndMD": 188, "wkndPM": 261}, {"peak_wkdyMD": 1302, "lon": -73.8132, "lat": 40.58392, "wkdyAM": 460, "wkdyPM": 619, "wkndMD": 201, "wkndPM": 163}, {"peak_wkdyMD": 1302, "lon": -73.79765, "lat": 40.70445, "wkdyAM": 781, "wkdyPM": 1419, "wkndMD": 695, "wkndPM": 744}, {"peak_wkdyMD": 1298, "lon": -73.81028, "lat": 40.58487, "wkdyAM": 411, "wkdyPM": 551, "wkndMD": 177, "wkndPM": 150}, {"peak_wkdyMD": 1258, "lon": -73.79548, "lat": 40.70626, "wkdyAM": 351, "wkdyPM": 635, "wkndMD": 504, "wkndPM": 684}, {"peak_wkdyMD": 1252, "lon": -73.93471, "lat": 40.74303, "wkdyAM": 810, "wkdyPM": 1580, "wkndMD": 809, "wkndPM": 724}], "Brooklyn": [{"peak_wkdyMD": 1630, "lon": -74.02166, "lat": 40.64473, "wkdyAM": 575, "wkdyPM": 991, "wkndMD": 516, "wkndPM": 737}, {"peak_wkdyMD": 1578, "lon": -73.9864, "lat": 40.6912, "wkdyAM": 918, "wkdyPM": 1217, "wkndMD": 889, "wkndPM": 873}, {"peak_wkdyMD": 1442, "lon": -73.99111, "lat": 40.69248, "wkdyAM": 1151, "wkdyPM": 1738, "wkndMD": 936, "wkndPM": 1335}, {"peak_wkdyMD": 1276, "lon": -73.95238, "lat": 40.63124, "wkdyAM": 562, "wkdyPM": 657, "wkndMD": 187, "wkndPM": 281}, {"peak_wkdyMD": 1201, "lon": -73.98677, "lat": 40.70248, "wkdyAM": 536, "wkdyPM": 949, "wkndMD": 1235, "wkndPM": 1228}, {"peak_wkdyMD": 1195, "lon": -73.9871, "lat": 40.69359, "wkdyAM": 1066, "wkdyPM": 950, "wkndMD": 881, "wkndPM": 1145}, {"peak_wkdyMD": 1181, "lon": -73.98885, "lat": 40.6892, "wkdyAM": 563, "wkdyPM": 989, "wkndMD": 1186, "wkndPM": 1060}, {"peak_wkdyMD": 1170, "lon": -73.94482, "lat": 40.65582, "wkdyAM": 577, "wkdyPM": 787, "wkndMD": 209, "wkndPM": 323}, {"peak_wkdyMD": 1161, "lon": -73.9411, "lat": 40.70017, "wkdyAM": 601, "wkdyPM": 1103, "wkndMD": 1051, "wkndPM": 1180}, {"peak_wkdyMD": 1150, "lon": -74.0086, "lat": 40.65691, "wkdyAM": 565, "wkdyPM": 892, "wkndMD": 614, "wkndPM": 765}], "Manhattan": [{"peak_wkdyMD": 2802, "lon": -73.97643, "lat": 40.75974, "wkdyAM": 958, "wkdyPM": 2347, "wkndMD": 377, "wkndPM": 559}, {"peak_wkdyMD": 2683, "lon": -73.98486, "lat": 40.75356, "wkdyAM": 2073, "wkdyPM": 3141, "wkndMD": 894, "wkndPM": 864}, {"peak_wkdyMD": 2620, "lon": -73.97874, "lat": 40.75334, "wkdyAM": 1380, "wkdyPM": 3010, "wkndMD": 509, "wkndPM": 655}, {"peak_wkdyMD": 2363, "lon": -73.97691, "lat": 40.75585, "wkdyAM": 932, "wkdyPM": 2302, "wkndMD": 370, "wkndPM": 548}, {"peak_wkdyMD": 2319, "lon": -73.97895, "lat": 40.75837, "wkdyAM": 1264, "wkdyPM": 2382, "wkndMD": 367, "wkndPM": 616}, {"peak_wkdyMD": 2298, "lon": -73.97325, "lat": 40.75857, "wkdyAM": 1540, "wkdyPM": 1707, "wkndMD": 631, "wkndPM": 874}, {"peak_wkdyMD": 2206, "lon": -73.98311, "lat": 40.75598, "wkdyAM": 1920, "wkdyPM": 2690, "wkndMD": 700, "wkndPM": 947}, {"peak_wkdyMD": 2194, "lon": -73.98783, "lat": 40.75504, "wkdyAM": 1839, "wkdyPM": 2476, "wkndMD": 930, "wkndPM": 1022}, {"peak_wkdyMD": 2163, "lon": -73.98189, "lat": 40.75231, "wkdyAM": 1267, "wkdyPM": 2134, "wkndMD": 1073, "wkndPM": 1131}, {"peak_wkdyMD": 2100, "lon": -73.97467, "lat": 40.75072, "wkdyAM": 1913, "wkdyPM": 2078, "wkndMD": 606, "wkndPM": 620}], "Bronx": [{"peak_wkdyMD": 1525, "lon": -73.92003, "lat": 40.8168, "wkdyAM": 1082, "wkdyPM": 1941, "wkndMD": 676, "wkndPM": 803}, {"peak_wkdyMD": 1511, "lon": -73.92502, "lat": 40.81809, "wkdyAM": 1032, "wkdyPM": 1149, "wkndMD": 801, "wkndPM": 1049}, {"peak_wkdyMD": 1480, "lon": -73.88148, "lat": 40.88265, "wkdyAM": 589, "wkdyPM": 1097, "wkndMD": 769, "wkndPM": 913}, {"peak_wkdyMD": 1264, "lon": -73.90083, "lat": 40.86833, "wkdyAM": 937, "wkdyPM": 1487, "wkndMD": 1045, "wkndPM": 1566}, {"peak_wkdyMD": 1261, "lon": -73.85528, "lat": 40.85558, "wkdyAM": 506, "wkdyPM": 876, "wkndMD": 952, "wkndPM": 793}, {"peak_wkdyMD": 1164, "lon": -73.87903, "lat": 40.87951, "wkdyAM": 303, "wkdyPM": 475, "wkndMD": 166, "wkndPM": 278}, {"peak_wkdyMD": 1152, "lon": -73.88368, "lat": 40.88042, "wkdyAM": 1289, "wkdyPM": 1169, "wkndMD": 474, "wkndPM": 828}, {"peak_wkdyMD": 1078, "lon": -73.89178, "lat": 40.82128, "wkdyAM": 576, "wkdyPM": 1171, "wkndMD": 833, "wkndPM": 1150}, {"peak_wkdyMD": 1023, "lon": -73.89185, "lat": 40.862, "wkdyAM": 682, "wkdyPM": 1167, "wkndMD": 1013, "wkndPM": 1323}, {"peak_wkdyMD": 1001, "lon": -73.92781, "lat": 40.81708, "wkdyAM": 1120, "wkdyPM": 1269, "wkndMD": 1040, "wkndPM": 1144}]}};
+
+// Borough framing — rough lat/lon bboxes for zoom
+const BORO_FRAME = {
+  Manhattan:      {name:'Manhattan',      lon:[-74.030,-73.907], lat:[40.695,40.880],
+                   blurb:"Every one of Manhattan's 10 busiest modeled corridors sits in Midtown — roughly from West 42nd to West 59th Street between 6th and Broadway."},
+  Brooklyn:       {name:'Brooklyn',       lon:[-74.045,-73.855], lat:[40.570,40.740],
+                   blurb:"Downtown Brooklyn and the Fulton Mall corridor lead, with secondary clusters around Bay Ridge and Flatbush Avenue."},
+  Queens:         {name:'Queens',         lon:[-73.965,-73.730], lat:[40.540,40.800],
+                   blurb:"Jackson Heights/Roosevelt Avenue and downtown Jamaica top the list, followed by Flushing — Queens's busiest corridors are its immigrant commercial spines."},
+  Bronx:          {name:'Bronx',          lon:[-73.935,-73.765], lat:[40.785,40.915],
+                   blurb:"The 3rd Avenue Hub at 149th Street and Fordham Plaza lead the borough — both are major retail and transit nodes."},
+  'Staten Island':{name:'Staten Island',  lon:[-74.260,-74.045], lat:[40.495,40.650],
+                   blurb:"Staten Island's busiest sidewalk is near the St. George Ferry Terminal — the rest cluster along North Shore bus corridors, a fraction of Manhattan's volumes."},
+};
+const BORO_ORDER = ['Manhattan','Brooklyn','Queens','Bronx','Staten Island'];
+
 const NS = 'http://www.w3.org/2000/svg';
-// frame covering ~Times Square/Midtown -- extend to show surrounding Manhattan context
-const LON0=-74.02, LON1=-73.95, LAT0=40.735, LAT1=40.79;
-const W=700,H=500;
-const px = ([lon,lat])=> [ (lon-LON0)/(LON1-LON0)*W, H-(lat-LAT0)/(LAT1-LAT0)*H ];
+const svgMap = document.getElementById('map');
+const tabsHost = document.getElementById('boroTabs');
+const legendHost = document.getElementById('boroLegend');
+const noteHost = document.getElementById('boroNote');
+const boroHead = document.getElementById('boroHead');
 
-// Rough Manhattan outline (simplified polygon)
-const MANHATTAN = [
-  [-74.019,40.700],[-74.015,40.720],[-74.012,40.740],[-74.009,40.755],[-74.005,40.770],
-  [-74.000,40.780],[-73.995,40.790],[-73.985,40.800],[-73.970,40.810],[-73.955,40.825],
-  [-73.935,40.850],[-73.928,40.870],[-73.918,40.873],[-73.910,40.870],[-73.925,40.850],
-  [-73.935,40.835],[-73.945,40.820],[-73.955,40.805],[-73.965,40.792],[-73.972,40.780],
-  [-73.975,40.770],[-73.972,40.762],[-73.968,40.758],[-73.965,40.752],[-73.963,40.745],
-  [-73.960,40.738],[-73.955,40.732],[-73.950,40.726],[-73.945,40.720],[-73.943,40.716],
-  [-73.975,40.710],[-73.995,40.705],[-74.010,40.700],[-74.019,40.700]
-];
-const outline = document.createElementNS(NS,'path');
-outline.setAttribute('d','M '+MANHATTAN.map(c=>px(c).map(v=>v.toFixed(1)).join(',')).join(' L ')+' Z');
-outline.setAttribute('fill','rgba(155,159,188,0.07)');
-outline.setAttribute('stroke','rgba(155,159,188,0.35)');
-outline.setAttribute('stroke-width','1');
-svg.appendChild(outline);
-
-// grid hint: 42nd, 59th streets
-function addHline(lat,label){
-  const y = px([-73.98,lat])[1];
-  const l = document.createElementNS(NS,'line');
-  l.setAttribute('x1',0);l.setAttribute('x2',W);l.setAttribute('y1',y);l.setAttribute('y2',y);
-  l.setAttribute('stroke','rgba(155,159,188,0.12)');l.setAttribute('stroke-dasharray','3 3');
-  svg.appendChild(l);
-  const t = document.createElementNS(NS,'text');
-  t.setAttribute('x',8);t.setAttribute('y',y-4);
-  t.setAttribute('fill','rgba(155,159,188,0.55)');t.setAttribute('font-size','11');
-  t.textContent=label; svg.appendChild(t);
-}
-addHline(40.7580,'W 42nd St');
-addHline(40.7660,'W 59th St / Central Park South');
-
-// dots
-TOP.forEach(c=>{
-  const [x,y]=px(c);
-  const halo = document.createElementNS(NS,'circle');
-  halo.setAttribute('cx',x);halo.setAttribute('cy',y);halo.setAttribute('r',9);
-  halo.setAttribute('fill','rgba(255,124,83,0.18)');svg.appendChild(halo);
-  const dot = document.createElementNS(NS,'circle');
-  dot.setAttribute('cx',x);dot.setAttribute('cy',y);dot.setAttribute('r',3.2);
-  dot.setAttribute('fill',VC.orange);svg.appendChild(dot);
+BORO_ORDER.forEach((b,i)=>{
+  const btn = document.createElement('button');
+  btn.className = 'tab' + (i===0?' active':'');
+  btn.textContent = b;
+  btn.onclick = ()=>selectBoro(b);
+  tabsHost.appendChild(btn);
 });
 
-// label Times Square approx
-function addLabel(lon,lat,text){
-  const [x,y]=px([lon,lat]);
-  const t = document.createElementNS(NS,'text');
-  t.setAttribute('x',x+10);t.setAttribute('y',y);
-  t.setAttribute('fill',VC.ink);t.setAttribute('font-size','12');
-  t.setAttribute('font-weight','700');
-  t.textContent=text; svg.appendChild(t);
+// Simplified borough outlines (fetched at build-time, inlined)
+const BORO_OUTLINES = {"Staten Island": [[[-74.05051, 40.56642], [-74.04932, 40.56589], [-74.04924, 40.56536], [-74.05107, 40.56672], [-74.05051, 40.56642]], [[-74.05314, 40.5777], [-74.0549, 40.57778], [-74.05369, 40.58055], [-74.05293, 40.5799], [-74.05314, 40.5777]], [[-74.15946, 40.64145], [-74.16111, 40.64184], [-74.16146, 40.64429], [-74.15743, 40.6433], [-74.15946, 40.64145]], [[-74.08221, 40.64828], [-74.07166, 40.64503], [-74.07033, 40.64253], [-74.07314, 40.64185], [-74.07019, 40.64201], [-74.07289, 40.64092], [-74.06998, 40.64107], [-74.07308, 40.64051], [-74.07349, 40.63723], [-74.07049, 40.63716], [-74.07342, 40.63689], [-74.07299, 40.63031], [-74.06802, 40.62879], [-74.07291, 40.63], [-74.07225, 40.62461], [-74.05381, 40.60591], [-74.05223, 40.59982], [-74.07336, 40.57827], [-74.091, 40.56674], [-74.10484, 40.55303], [-74.10735, 40.55415], [-74.11279, 40.54788], [-74.12245, 40.54477], [-74.13691, 40.52928], [-74.14049, 40.535], [-74.1341, 40.53549], [-74.12799, 40.54071], [-74.13073, 40.54626], [-74.13795, 40.546], [-74.1423, 40.54225], [-74.14226, 40.53814], [-74.14184, 40.53842], [-74.14217, 40.53793], [-74.14104, 40.53735], [-74.1413, 40.53714], [-74.17758, 40.51923], [-74.18483, 40.51934], [-74.19521, 40.50998], [-74.19936, 40.51301], [-74.2076, 40.51183], [-74.21758, 40.50334], [-74.24676, 40.49613], [-74.25308, 40.50003], [-74.25559, 40.50764], [-74.25353, 40.51168], [-74.24941, 40.51698], [-74.23982, 40.52009], [-74.24397, 40.5249], [-74.24205, 40.53435], [-74.24804, 40.54309], [-74.23071, 40.55556], [-74.21859, 40.55467], [-74.21197, 40.55844], [-74.20465, 40.58929], [-74.19751, 40.5968], [-74.20282, 40.60827], [-74.20079, 40.63035], [-74.19462, 40.63739], [-74.17996, 40.64527], [-74.17959, 40.64192], [-74.17437, 40.64514], [-74.17134, 40.64286], [-74.17298, 40.64049], [-74.1661, 40.64241], [-74.1528, 40.63713], [-74.15139, 40.6394], [-74.14856, 40.63744], [-74.13435, 40.64189], [-74.12703, 40.63932], [-74.10974, 40.64546], [-74.08221, 40.64828]]], "Queens": [[[-73.83668, 40.59495], [-73.83258, 40.59212], [-73.83348, 40.58937], [-73.84386, 40.59343], [-73.83668, 40.59495]], [[-73.8134, 40.60436], [-73.80986, 40.6019], [-73.81158, 40.59814], [-73.81502, 40.60206], [-73.8134, 40.60436]], [[-73.82718, 40.60792], [-73.8259, 40.60647], [-73.82862, 40.60584], [-73.82815, 40.60795], [-73.82718, 40.60792]], [[-73.82608, 40.60844], [-73.82771, 40.6084], [-73.82805, 40.61005], [-73.82688, 40.6096], [-73.82608, 40.60844]], [[-73.83244, 40.60593], [-73.83588, 40.60564], [-73.83252, 40.61039], [-73.83033, 40.60849], [-73.83244, 40.60593]], [[-73.7942, 40.60773], [-73.79696, 40.60412], [-73.80521, 40.60674], [-73.80159, 40.61023], [-73.7942, 40.60773]], [[-73.76669, 40.61425], [-73.76024, 40.61082], [-73.76178, 40.60915], [-73.76155, 40.60903], [-73.74576, 40.61199], [-73.73815, 40.60271], [-73.73809, 40.59769], [-73.74183, 40.5967], [-73.73812, 40.59739], [-73.73764, 40.59441], [-73.81352, 40.58347], [-73.87028, 40.56417], [-73.90691, 40.5556], [-73.94074, 40.54182], [-73.93985, 40.55456], [-73.92616, 40.56155], [-73.91197, 40.56587], [-73.90151, 40.56296], [-73.89261, 40.56859], [-73.87761, 40.56886], [-73.85044, 40.58213], [-73.8393, 40.58186], [-73.82146, 40.58677], [-73.80959, 40.59358], [-73.80572, 40.59076], [-73.80798, 40.59416], [-73.80244, 40.59264], [-73.80235, 40.5945], [-73.80344, 40.59443], [-73.80321, 40.59515], [-73.80389, 40.59499], [-73.80331, 40.59518], [-73.80369, 40.5952], [-73.80487, 40.59673], [-73.80513, 40.59661], [-73.80525, 40.5969], [-73.80298, 40.59884], [-73.78635, 40.60319], [-73.79034, 40.59919], [-73.79104, 40.59552], [-73.78975, 40.59474], [-73.77857, 40.60964], [-73.77535, 40.60974], [-73.77422, 40.60889], [-73.77469, 40.60433], [-73.78133, 40.59775], [-73.77497, 40.60174], [-73.77358, 40.59812], [-73.76812, 40.59782], [-73.77116, 40.59942], [-73.769, 40.60939], [-73.77417, 40.61183], [-73.76669, 40.61425]], [[-73.76671, 40.61491], [-73.76825, 40.61488], [-73.77398, 40.616], [-73.76874, 40.6209], [-73.76671, 40.61491]], [[-73.79784, 40.62741], [-73.79566, 40.62611], [-73.79922, 40.62409], [-73.79363, 40.62516], [-73.79992, 40.61857], [-73.80173, 40.61997], [-73.80128, 40.61588], [-73.80509, 40.61343], [-73.80698, 40.62387], [-73.79784, 40.62741]], [[-73.81307, 40.62926], [-73.81129, 40.6247], [-73.8109, 40.61622], [-73.81731, 40.63062], [-73.81307, 40.62926]], [[-73.82338, 40.63899], [-73.82107, 40.62973], [-73.81611, 40.62461], [-73.81889, 40.62263], [-73.81571, 40.62149], [-73.81777, 40.6175], [-73.81408, 40.61456], [-73.81476, 40.60846], [-73.8212, 40.59478], [-73.83241, 40.59462], [-73.83485, 40.59554], [-73.83239, 40.5978], [-73.82147, 40.59999], [-73.82445, 40.6008], [-73.81962, 40.61048], [-73.82088, 40.61226], [-73.82161, 40.60848], [-73.82556, 40.61413], [-73.83402, 40.61438], [-73.83114, 40.63265], [-73.83341, 40.6385], [-73.82592, 40.63575], [-73.82338, 40.63899]], [[-73.85976, 40.6541], [-73.86048, 40.65466], [-73.86099, 40.65521], [-73.85979, 40.65448], [-73.85976, 40.6541]], [[-73.83033, 40.65513], [-73.83027, 40.65543], [-73.82989, 40.65552], [-73.82995, 40.65542], [-73.83033, 40.65513]], [[-73.87287, 40.78598], [-73.87283, 40.78595], [-73.87277, 40.78594], [-73.87281, 40.7859], [-73.87287, 40.78598]], [[-73.8205, 40.80101], [-73.8137, 40.79708], [-73.79641, 40.79573], [-73.79281, 40.78878], [-73.78175, 40.79113], [-73.78326, 40.79492], [-73.77687, 40.79644], [-73.77063, 40.78846], [-73.77634, 40.78849], [-73.76678, 40.77981], [-73.7651, 40.7738], [-73.74466, 40.75656], [-73.75507, 40.76753], [-73.75552, 40.7777], [-73.75081, 40.78289], [-73.70135, 40.75078], [-73.70002, 40.73924], [-73.70766, 40.72783], [-73.73033, 40.72216], [-73.72689, 40.70998], [-73.72563, 40.67959], [-73.72833, 40.66304], [-73.72523, 40.652], [-73.74144, 40.64689], [-73.73996, 40.63514], [-73.74373, 40.63902], [-73.74702, 40.63691], [-73.74729, 40.64319], [-73.75476, 40.64781], [-73.74742, 40.64141], [-73.74855, 40.63541], [-73.76502, 40.62941], [-73.77077, 40.62003], [-73.77082, 40.62328], [-73.77173, 40.62358], [-73.77203, 40.62299], [-73.77219, 40.623], [-73.77512, 40.61923], [-73.77518, 40.61926], [-73.77174, 40.62361], [-73.77924, 40.62732], [-73.78521, 40.62006], [-73.78091, 40.6136], [-73.7914, 40.60761], [-73.8008, 40.61193], [-73.79457, 40.62262], [-73.78968, 40.62262], [-73.78265, 40.63025], [-73.7895, 40.63427], [-73.79812, 40.63104], [-73.79081, 40.63431], [-73.82125, 40.64914], [-73.82234, 40.65936], [-73.8113, 40.66063], [-73.82352, 40.66007], [-73.82311, 40.648], [-73.83094, 40.65163], [-73.82901, 40.65611], [-73.83171, 40.65393], [-73.83222, 40.65446], [-73.83149, 40.65498], [-73.83116, 40.65592], [-73.82938, 40.65651], [-73.82897, 40.6572], [-73.82918, 40.6578], [-73.83013, 40.6584], [-73.82971, 40.6585], [-73.8296, 40.65866], [-73.83016, 40.6598], [-73.83185, 40.65489], [-73.83097, 40.65823], [-73.83338, 40.65805], [-73.83109, 40.64849], [-73.83448, 40.64811], [-73.83874, 40.66245], [-73.83592, 40.6455], [-73.84951, 40.64413], [-73.85242, 40.64739], [-73.8494, 40.65143], [-73.85592, 40.65131], [-73.86136, 40.65642], [-73.85983, 40.65698], [-73.85964, 40.65846], [-73.86317, 40.65828], [-73.85568, 40.66387], [-73.85763, 40.67166], [-73.86039, 40.67127], [-73.86603, 40.68192], [-73.86892, 40.69515], [-73.89647, 40.68234], [-73.9058, 40.69413], [-73.90426, 40.6957], [-73.92189, 40.7094], [-73.92412, 40.71514], [-73.92057, 40.716], [-73.92515, 40.72232], [-73.92037, 40.72368], [-73.93805, 40.73051], [-73.94594, 40.7375], [-73.94146, 40.73925], [-73.93859, 40.74293], [-73.94715, 40.7379], [-73.96261, 40.7388], [-73.95679, 40.74884], [-73.95318, 40.74773], [-73.9562, 40.74969], [-73.9435, 40.7645], [-73.93489, 40.77004], [-73.93781, 40.77356], [-73.93638, 40.77692], [-73.92861, 40.77659], [-73.90986, 40.79095], [-73.89593, 40.78565], [-73.90115, 40.78271], [-73.90258, 40.78029], [-73.89439, 40.78424], [-73.89529, 40.78154], [-73.89275, 40.78297], [-73.89166, 40.7822], [-73.89252, 40.77741], [-73.89183, 40.77488], [-73.89009, 40.77778], [-73.88945, 40.77353], [-73.88392, 40.77413], [-73.88488, 40.77999], [-73.87871, 40.78059], [-73.87886, 40.7824], [-73.87975, 40.78284], [-73.8797, 40.78288], [-73.87516, 40.78151], [-73.87125, 40.78604], [-73.86788, 40.78736], [-73.87256, 40.78082], [-73.85505, 40.7722], [-73.8582, 40.77032], [-73.85625, 40.76889], [-73.86276, 40.76676], [-73.85069, 40.75945], [-73.83913, 40.76599], [-73.84781, 40.76677], [-73.8513, 40.77181], [-73.84897, 40.77802], [-73.85236, 40.77917], [-73.84925, 40.78226], [-73.85528, 40.78198], [-73.85953, 40.78553], [-73.85284, 40.78821], [-73.85369, 40.79402], [-73.8379, 40.79851], [-73.84026, 40.79759], [-73.83728, 40.78901], [-73.83293, 40.78852], [-73.82793, 40.79288], [-73.82946, 40.79682], [-73.8205, 40.80101]]], "Brooklyn": [[[-73.86706, 40.58209], [-73.87116, 40.58687], [-73.86635, 40.59189], [-73.86125, 40.58799], [-73.86706, 40.58209]], [[-73.9199, 40.5996], [-73.91626, 40.59816], [-73.91295, 40.59205], [-73.92183, 40.59734], [-73.9199, 40.5996]], [[-73.87019, 40.599], [-73.87108, 40.5989], [-73.87049, 40.6026], [-73.87026, 40.60168], [-73.87019, 40.599]], [[-73.85243, 40.59733], [-73.86044, 40.59647], [-73.86336, 40.60032], [-73.85483, 40.60187], [-73.85077, 40.59884], [-73.85243, 40.59733]], [[-73.86703, 40.60374], [-73.86768, 40.60307], [-73.86831, 40.60314], [-73.86794, 40.60396], [-73.86703, 40.60374]], [[-73.86966, 40.60654], [-73.87109, 40.60469], [-73.873, 40.61055], [-73.87104, 40.60972], [-73.86966, 40.60654]], [[-73.85523, 40.61613], [-73.8553, 40.61315], [-73.84974, 40.61516], [-73.85011, 40.61021], [-73.85516, 40.60612], [-73.85925, 40.61125], [-73.85648, 40.61319], [-73.85858, 40.61692], [-73.85523, 40.61613]], [[-73.84304, 40.61774], [-73.84454, 40.61487], [-73.83826, 40.61385], [-73.84079, 40.60564], [-73.84715, 40.60361], [-73.85179, 40.6069], [-73.84779, 40.60923], [-73.84615, 40.61773], [-73.84304, 40.61774]], [[-73.83342, 40.62678], [-73.83402, 40.61438], [-73.83434, 40.61436], [-73.83779, 40.61556], [-73.83342, 40.62678]], [[-73.87085, 40.61697], [-73.87825, 40.61545], [-73.87481, 40.62359], [-73.86684, 40.62783], [-73.86626, 40.61846], [-73.87085, 40.61697]], [[-73.84734, 40.62909], [-73.84985, 40.62622], [-73.84358, 40.62318], [-73.86365, 40.61788], [-73.86103, 40.62414], [-73.86348, 40.62339], [-73.86335, 40.62593], [-73.84734, 40.62909]], [[-73.83624, 40.63111], [-73.8411, 40.62456], [-73.84446, 40.62985], [-73.83765, 40.63284], [-73.83624, 40.63111]], [[-73.84722, 40.63197], [-73.84859, 40.63013], [-73.85856, 40.63046], [-73.85614, 40.63508], [-73.84668, 40.63873], [-73.84352, 40.6365], [-73.84722, 40.63197]], [[-73.9544, 40.73911], [-73.92924, 40.7274], [-73.92458, 40.71916], [-73.9322, 40.71497], [-73.93328, 40.71098], [-73.93036, 40.70872], [-73.93085, 40.7149], [-73.92364, 40.71732], [-73.92189, 40.7094], [-73.90426, 40.6957], [-73.9058, 40.69413], [-73.89647, 40.68234], [-73.86843, 40.69472], [-73.86603, 40.68192], [-73.86039, 40.67127], [-73.85763, 40.67166], [-73.85568, 40.66387], [-73.86328, 40.65694], [-73.85696, 40.65059], [-73.85717, 40.64368], [-73.86563, 40.63879], [-73.87933, 40.65462], [-73.868, 40.63811], [-73.87445, 40.63666], [-73.891, 40.64935], [-73.87714, 40.63598], [-73.88365, 40.63094], [-73.88369, 40.62756], [-73.88753, 40.62833], [-73.89577, 40.62252], [-73.91751, 40.63144], [-73.90072, 40.62163], [-73.89647, 40.62143], [-73.89586, 40.61452], [-73.89095, 40.61283], [-73.89396, 40.61121], [-73.8897, 40.61145], [-73.89335, 40.60674], [-73.89983, 40.6055], [-73.90133, 40.61172], [-73.90879, 40.61744], [-73.90164, 40.60576], [-73.91365, 40.60398], [-73.91709, 40.60882], [-73.91428, 40.61494], [-73.91952, 40.60774], [-73.91443, 40.60286], [-73.90894, 40.60161], [-73.88398, 40.60557], [-73.87672, 40.58491], [-73.8797, 40.58013], [-73.89552, 40.57677], [-73.89903, 40.58767], [-73.91148, 40.58608], [-73.91204, 40.59451], [-73.91513, 40.59878], [-73.92152, 40.60192], [-73.92486, 40.59982], [-73.93017, 40.60403], [-73.93212, 40.60269], [-73.91421, 40.5892], [-73.92476, 40.58563], [-73.92808, 40.5877], [-73.92395, 40.59114], [-73.92863, 40.58857], [-73.9326, 40.59493], [-73.93125, 40.58685], [-73.92529, 40.58464], [-73.9135, 40.5861], [-73.91246, 40.58335], [-73.9173, 40.58319], [-73.91148, 40.58183], [-73.95349, 40.58299], [-73.93258, 40.58127], [-73.93106, 40.57616], [-74.00208, 40.56959], [-74.01202, 40.57489], [-74.01202, 40.57961], [-74.00605, 40.58198], [-73.98843, 40.57882], [-73.98605, 40.58172], [-73.99163, 40.58108], [-73.99026, 40.58462], [-74.00018, 40.58307], [-73.99408, 40.58869], [-74.00037, 40.58648], [-73.99839, 40.59353], [-74.03604, 40.6093], [-74.04162, 40.62056], [-74.03681, 40.63898], [-74.03876, 40.63959], [-74.03407, 40.64431], [-74.02821, 40.64402], [-74.02605, 40.64626], [-74.02939, 40.6488], [-74.02467, 40.6471], [-74.02605, 40.65099], [-74.02285, 40.65117], [-74.02537, 40.65272], [-74.02125, 40.65084], [-74.02321, 40.6541], [-74.01787, 40.65406], [-74.0198, 40.65649], [-74.01665, 40.65534], [-74.01911, 40.65737], [-74.01505, 40.65695], [-74.01746, 40.65945], [-74.01554, 40.66076], [-74.0086, 40.65952], [-74.00955, 40.66327], [-74.00349, 40.66224], [-74.00767, 40.66479], [-73.99953, 40.6644], [-74.00293, 40.66646], [-73.99998, 40.66745], [-73.99903, 40.66844], [-73.99877, 40.6716], [-74.00289, 40.66735], [-74.00697, 40.66605], [-74.00544, 40.67092], [-74.00755, 40.66705], [-74.00985, 40.66852], [-74.01154, 40.66509], [-74.01575, 40.66457], [-74.0169, 40.66485], [-74.01934, 40.67162], [-74.01649, 40.66493], [-74.01034, 40.66908], [-74.01569, 40.67104], [-74.01298, 40.67333], [-74.01632, 40.67291], [-74.01496, 40.67468], [-74.0188, 40.67225], [-74.01928, 40.67965], [-74.01282, 40.68362], [-74.01302, 40.68041], [-74.00967, 40.68327], [-74.01193, 40.68389], [-74.00096, 40.69013], [-73.99457, 40.70438], [-73.97835, 40.706], [-73.97574, 40.69957], [-73.97078, 40.69998], [-73.97284, 40.70273], [-73.96949, 40.70052], [-73.97463, 40.70768], [-73.9711, 40.70585], [-73.97232, 40.70908], [-73.97018, 40.70493], [-73.96752, 40.70344], [-73.97001, 40.71045], [-73.96727, 40.71699], [-73.96211, 40.72515], [-73.95794, 40.72465], [-73.96161, 40.72587], [-73.96228, 40.73405], [-73.9544, 40.73911]]], "Manhattan": [[[-74.01093, 40.68449], [-74.01218, 40.68409], [-74.00816, 40.68617], [-74.0086, 40.68591], [-74.01093, 40.68449]], [[-74.005, 40.68761], [-74.00563, 40.68678], [-74.00783, 40.68738], [-74.00742, 40.68821], [-74.005, 40.68761]], [[-74.00382, 40.68893], [-74.00459, 40.68821], [-74.00678, 40.68883], [-74.00637, 40.68967], [-74.00382, 40.68893]], [[-74.00298, 40.69043], [-74.00341, 40.68961], [-74.00576, 40.69024], [-74.00534, 40.69109], [-74.00298, 40.69043]], [[-74.04388, 40.69019], [-74.04439, 40.68852], [-74.04773, 40.68991], [-74.04615, 40.69112], [-74.04388, 40.69019]], [[-74.00133, 40.69123], [-74.0007, 40.69061], [-74.00479, 40.69176], [-74.00441, 40.69253], [-74.00133, 40.69123]], [[-74.01675, 40.69334], [-74.01181, 40.69248], [-74.01317, 40.68816], [-74.02306, 40.68292], [-74.02633, 40.6848], [-74.01675, 40.69334]], [[-74.00154, 40.69279], [-74.00174, 40.69241], [-74.00401, 40.69321], [-74.00346, 40.69406], [-74.00154, 40.69279]], [[-74.00078, 40.69429], [-74.00096, 40.69407], [-74.00301, 40.69478], [-74.0024, 40.69571], [-74.00078, 40.69429]], [[-74.00043, 40.69705], [-73.99959, 40.69678], [-73.99941, 40.69689], [-73.99952, 40.69658], [-74.00043, 40.69705]], [[-73.99838, 40.69806], [-73.99887, 40.69716], [-74.00105, 40.69791], [-74.00049, 40.69876], [-73.99838, 40.69806]], [[-73.998, 40.6988], [-73.99802, 40.69876], [-74.00002, 40.69947], [-73.99948, 40.70032], [-73.998, 40.6988]], [[-74.03995, 40.70089], [-74.03771, 40.69934], [-74.04124, 40.69954], [-74.04166, 40.69645], [-74.04367, 40.69802], [-74.03995, 40.70089]], [[-73.99538, 40.70264], [-73.9967, 40.70088], [-73.99814, 40.70152], [-73.99619, 40.70338], [-73.99538, 40.70264]], [[-73.99502, 40.70315], [-73.99545, 40.70327], [-73.99529, 40.70355], [-73.9948, 40.70329], [-73.99502, 40.70315]], [[-73.99477, 40.70395], [-73.99488, 40.70379], [-73.99503, 40.70381], [-73.99488, 40.70401], [-73.99477, 40.70395]], [[-73.98237, 40.70554], [-73.98242, 40.70582], [-73.98102, 40.7059], [-73.9823, 40.70574], [-73.98237, 40.70554]], [[-73.96715, 40.71832], [-73.96656, 40.71802], [-73.96731, 40.71831], [-73.96718, 40.71848], [-73.96715, 40.71832]], [[-73.96435, 40.7204], [-73.9644, 40.7203], [-73.96468, 40.72047], [-73.96459, 40.72055], [-73.96435, 40.7204]], [[-73.964, 40.72094], [-73.96409, 40.72076], [-73.96505, 40.72136], [-73.96489, 40.72147], [-73.964, 40.72094]], [[-73.96237, 40.72421], [-73.96201, 40.72399], [-73.96207, 40.72388], [-73.96247, 40.72413], [-73.96237, 40.72421]], [[-73.9623, 40.73311], [-73.96226, 40.73292], [-73.96409, 40.73292], [-73.96365, 40.73299], [-73.9623, 40.73311]], [[-73.96125, 40.74043], [-73.96126, 40.74033], [-73.96164, 40.74036], [-73.96163, 40.74046], [-73.96125, 40.74043]], [[-73.96421, 40.7466], [-73.96444, 40.74641], [-73.96458, 40.74645], [-73.96416, 40.74687], [-73.96421, 40.7466]], [[-73.9418, 40.76905], [-73.95254, 40.75709], [-73.96158, 40.74941], [-73.94008, 40.77293], [-73.9418, 40.76905]], [[-73.93805, 40.78083], [-73.9376, 40.78047], [-73.93958, 40.77958], [-73.93874, 40.78104], [-73.93805, 40.78083]], [[-73.92134, 40.80085], [-73.91444, 40.79567], [-73.91514, 40.79201], [-73.92448, 40.78232], [-73.93502, 40.78301], [-73.93241, 40.78972], [-73.9261, 40.79073], [-73.92559, 40.79182], [-73.92827, 40.79233], [-73.92725, 40.80039], [-73.92134, 40.80085]], [[-73.92641, 40.87762], [-73.9224, 40.87678], [-73.92126, 40.87308], [-73.92088, 40.87546], [-73.91043, 40.87148], [-73.91944, 40.85885], [-73.92159, 40.86007], [-73.93492, 40.83523], [-73.93434, 40.80956], [-73.92903, 40.80108], [-73.92928, 40.79585], [-73.94324, 40.78333], [-73.94293, 40.77468], [-73.97136, 40.74384], [-73.97451, 40.73589], [-73.97149, 40.72735], [-73.97671, 40.71154], [-73.99808, 40.70851], [-74.00835, 40.70067], [-74.01507, 40.70032], [-74.01934, 40.70609], [-74.01671, 40.71862], [-74.01307, 40.71892], [-74.01165, 40.72587], [-74.0152, 40.72636], [-74.01154, 40.72645], [-74.01439, 40.72846], [-74.01094, 40.73302], [-74.014, 40.73333], [-74.01073, 40.73344], [-74.01266, 40.74075], [-74.00949, 40.74074], [-74.01215, 40.74356], [-74.0089, 40.74392], [-74.01178, 40.7456], [-74.00946, 40.74575], [-74.01158, 40.74661], [-74.00924, 40.74676], [-74.01141, 40.74763], [-74.00906, 40.74779], [-74.00997, 40.75293], [-74.0048, 40.75781], [-74.007, 40.75923], [-74.00097, 40.76342], [-74.00316, 40.76473], [-73.99962, 40.76356], [-74.00229, 40.76556], [-73.99827, 40.76555], [-74.00156, 40.767], [-73.99807, 40.76587], [-74.00065, 40.76825], [-73.99716, 40.76713], [-73.99974, 40.76951], [-73.99707, 40.76873], [-73.99903, 40.77046], [-73.99493, 40.77147], [-73.99668, 40.7735], [-73.99416, 40.77249], [-73.99618, 40.77399], [-73.99227, 40.77512], [-73.98887, 40.77969], [-73.99155, 40.77958], [-73.9582, 40.82228], [-73.94612, 40.84389], [-73.94696, 40.85047], [-73.94187, 40.85387], [-73.92641, 40.87762]], [[-73.9236, 40.8789], [-73.92364, 40.87882], [-73.92368, 40.87883], [-73.92363, 40.87896], [-73.9236, 40.8789]], [[-73.90665, 40.87575], [-73.90893, 40.87216], [-73.91579, 40.87572], [-73.91033, 40.87904], [-73.90665, 40.87575]]], "Bronx": [[[-73.89681, 40.79581], [-73.89797, 40.79565], [-73.89919, 40.7965], [-73.89788, 40.79712], [-73.89681, 40.79581]], [[-73.88885, 40.79871], [-73.88665, 40.79804], [-73.88372, 40.79569], [-73.87288, 40.79145], [-73.87081, 40.7879], [-73.87831, 40.78536], [-73.88905, 40.78737], [-73.89282, 40.79282], [-73.88885, 40.79871]], [[-73.89833, 40.80241], [-73.89647, 40.80079], [-73.90021, 40.79926], [-73.90004, 40.80091], [-73.89833, 40.80241]], [[-73.78833, 40.83467], [-73.78931, 40.83447], [-73.78951, 40.83536], [-73.78846, 40.83531], [-73.78833, 40.83467]], [[-73.80222, 40.84163], [-73.80264, 40.84108], [-73.80695, 40.84146], [-73.80681, 40.84249], [-73.80222, 40.84163]], [[-73.78062, 40.85574], [-73.78091, 40.85497], [-73.78156, 40.855], [-73.78123, 40.85609], [-73.78062, 40.85574]], [[-73.78283, 40.85587], [-73.78302, 40.85509], [-73.78395, 40.85563], [-73.78343, 40.85636], [-73.78283, 40.85587]], [[-73.79019, 40.85861], [-73.78804, 40.85756], [-73.78796, 40.85348], [-73.7804, 40.84693], [-73.78337, 40.84445], [-73.78348, 40.84368], [-73.78291, 40.84394], [-73.78053, 40.84452], [-73.77993, 40.84388], [-73.78347, 40.84365], [-73.78023, 40.84378], [-73.78287, 40.84248], [-73.7806, 40.84279], [-73.7802, 40.84205], [-73.78282, 40.83634], [-73.79179, 40.84673], [-73.78951, 40.8513], [-73.79312, 40.85158], [-73.79042, 40.85302], [-73.79282, 40.85249], [-73.79081, 40.8532], [-73.79288, 40.85294], [-73.79315, 40.85647], [-73.79019, 40.85861]], [[-73.76783, 40.85444], [-73.76938, 40.85254], [-73.76901, 40.8451], [-73.77296, 40.85216], [-73.77219, 40.85999], [-73.76533, 40.85504], [-73.76783, 40.85444]], [[-73.78452, 40.86048], [-73.7852, 40.85883], [-73.78743, 40.85894], [-73.78686, 40.86004], [-73.78452, 40.86048]], [[-73.7729, 40.86121], [-73.77323, 40.86075], [-73.77351, 40.86124], [-73.77311, 40.86162], [-73.7729, 40.86121]], [[-73.7746, 40.86207], [-73.77494, 40.86139], [-73.77529, 40.86123], [-73.77486, 40.86198], [-73.7746, 40.86207]], [[-73.78313, 40.86286], [-73.78288, 40.86241], [-73.78315, 40.86207], [-73.78328, 40.86278], [-73.78313, 40.86286]], [[-73.78401, 40.86313], [-73.78379, 40.86259], [-73.78469, 40.86254], [-73.78429, 40.86321], [-73.78401, 40.86313]], [[-73.76965, 40.86549], [-73.76979, 40.86513], [-73.77023, 40.86514], [-73.77007, 40.86553], [-73.76965, 40.86549]], [[-73.76669, 40.8671], [-73.7671, 40.86671], [-73.76779, 40.86678], [-73.7676, 40.8675], [-73.76669, 40.8671]], [[-73.77081, 40.87155], [-73.76991, 40.87048], [-73.77288, 40.87125], [-73.77218, 40.87198], [-73.77081, 40.87155]], [[-73.78648, 40.87321], [-73.78673, 40.87308], [-73.78626, 40.87339], [-73.78633, 40.87327], [-73.78648, 40.87321]], [[-73.78605, 40.87378], [-73.78619, 40.8736], [-73.78633, 40.87368], [-73.7862, 40.87389], [-73.78605, 40.87378]], [[-73.77435, 40.87417], [-73.77454, 40.87471], [-73.7741, 40.8749], [-73.77403, 40.87439], [-73.77435, 40.87417]], [[-73.78242, 40.87492], [-73.78266, 40.87479], [-73.7828, 40.87495], [-73.78248, 40.87517], [-73.78242, 40.87492]], [[-73.78103, 40.87648], [-73.78121, 40.87629], [-73.78133, 40.87636], [-73.78113, 40.87665], [-73.78103, 40.87648]], [[-73.78651, 40.88094], [-73.78578, 40.88036], [-73.78742, 40.87977], [-73.78713, 40.88092], [-73.78651, 40.88094]], [[-73.87295, 40.90444], [-73.85947, 40.90052], [-73.85459, 40.90894], [-73.85107, 40.91037], [-73.85348, 40.90753], [-73.84139, 40.90417], [-73.83839, 40.89407], [-73.79301, 40.88336], [-73.79744, 40.87514], [-73.80252, 40.87051], [-73.80339, 40.8725], [-73.80302, 40.86915], [-73.80842, 40.87119], [-73.80306, 40.86581], [-73.79479, 40.8732], [-73.79289, 40.87926], [-73.78956, 40.88126], [-73.78952, 40.879], [-73.78438, 40.87842], [-73.78719, 40.87273], [-73.78359, 40.87378], [-73.7832, 40.87067], [-73.79139, 40.86814], [-73.7919, 40.86083], [-73.79872, 40.85491], [-73.80029, 40.84815], [-73.80418, 40.85334], [-73.80484, 40.86161], [-73.80768, 40.85854], [-73.8151, 40.86306], [-73.81231, 40.85416], [-73.81641, 40.85408], [-73.81712, 40.85127], [-73.81503, 40.8455], [-73.8117, 40.84668], [-73.81437, 40.84309], [-73.81567, 40.84438], [-73.81824, 40.84434], [-73.81473, 40.84138], [-73.81488, 40.83103], [-73.80993, 40.82818], [-73.81397, 40.82419], [-73.80698, 40.82539], [-73.80462, 40.81903], [-73.79738, 40.81576], [-73.80305, 40.81245], [-73.80472, 40.81523], [-73.80705, 40.81653], [-73.80505, 40.81289], [-73.79086, 40.80734], [-73.79057, 40.80456], [-73.8162, 40.81385], [-73.83018, 40.81083], [-73.83162, 40.80494], [-73.83744, 40.8062], [-73.84043, 40.81254], [-73.83888, 40.82214], [-73.84233, 40.82907], [-73.83885, 40.83369], [-73.83972, 40.83957], [-73.84311, 40.82979], [-73.84, 40.81994], [-73.84617, 40.81068], [-73.85115, 40.8144], [-73.85538, 40.81429], [-73.84914, 40.8123], [-73.84808, 40.80492], [-73.85605, 40.80459], [-73.85919, 40.80627], [-73.85895, 40.81027], [-73.85939, 40.80816], [-73.86766, 40.81058], [-73.87078, 40.81449], [-73.87652, 40.81613], [-73.86811, 40.80675], [-73.87235, 40.80018], [-73.8951, 40.80686], [-73.90222, 40.80495], [-73.91169, 40.79662], [-73.92763, 40.8027], [-73.93286, 40.81012], [-73.93314, 40.83519], [-73.90665, 40.87575], [-73.91033, 40.87904], [-73.91776, 40.87566], [-73.9249, 40.87889], [-73.9115, 40.91377], [-73.87295, 40.90444]]]};
+
+function drawBoro(boro){
+  while (svgMap.firstChild) svgMap.removeChild(svgMap.firstChild);
+  const fr = BORO_FRAME[boro];
+  const W=700, H=520;
+  const [lon0,lon1] = fr.lon, [lat0,lat1] = fr.lat;
+  // preserve aspect ratio roughly (lat compresses lon by cos(lat))
+  const coslat = Math.cos((lat0+lat1)/2 * Math.PI/180);
+  const dataAspect = ((lon1-lon0)*coslat) / (lat1-lat0);
+  const viewAspect = W/H;
+  let plon0=lon0,plon1=lon1,plat0=lat0,plat1=lat1;
+  if (dataAspect > viewAspect){
+    // too wide — extend lat
+    const need = (lon1-lon0)*coslat / viewAspect;
+    const mid = (lat0+lat1)/2;
+    plat0 = mid - need/2; plat1 = mid + need/2;
+  } else {
+    const need = (lat1-lat0)*viewAspect / coslat;
+    const mid = (lon0+lon1)/2;
+    plon0 = mid - need/2; plon1 = mid + need/2;
+  }
+  const px = ([lon,lat])=> [
+    (lon-plon0)/(plon1-plon0)*W,
+    H - (lat-plat0)/(plat1-plat0)*H
+  ];
+
+  // draw all borough outlines in light gray for context
+  Object.keys(BORO_OUTLINES).forEach(b=>{
+    const rings = BORO_OUTLINES[b];
+    rings.forEach(ring=>{
+      const d = 'M ' + ring.map(c=>px(c).map(v=>v.toFixed(1)).join(',')).join(' L ') + ' Z';
+      const p = document.createElementNS(NS,'path');
+      p.setAttribute('d',d);
+      if (b === boro){
+        p.setAttribute('fill', VC.white);
+        p.setAttribute('stroke', VC.ink);
+        p.setAttribute('stroke-width', '1.2');
+      } else {
+        p.setAttribute('fill', VC.paper);
+        p.setAttribute('stroke', VC.cloud);
+        p.setAttribute('stroke-width', '0.7');
+      }
+      svgMap.appendChild(p);
+    });
+  });
+
+  // corridor dots
+  const corridors = (BORO_DATA && BORO_DATA.boroughs[boro]) || [];
+  const maxPeak = corridors.length ? corridors[0].peak_wkdyMD : 1;
+  corridors.forEach((c, i)=>{
+    const [x,y] = px([c.lon, c.lat]);
+    const r = 6 + 10*(c.peak_wkdyMD/maxPeak);
+    const halo = document.createElementNS(NS,'circle');
+    halo.setAttribute('cx',x); halo.setAttribute('cy',y);
+    halo.setAttribute('r', r+6);
+    halo.setAttribute('fill','rgba(255,124,83,0.16)');
+    svgMap.appendChild(halo);
+    const dot = document.createElementNS(NS,'circle');
+    dot.setAttribute('cx',x); dot.setAttribute('cy',y);
+    dot.setAttribute('r',r);
+    dot.setAttribute('fill', i===0 ? VC.magenta : VC.orange);
+    dot.setAttribute('stroke', VC.white);
+    dot.setAttribute('stroke-width','1.5');
+    svgMap.appendChild(dot);
+    const label = document.createElementNS(NS,'text');
+    label.setAttribute('x', x);
+    label.setAttribute('y', y - r - 6);
+    label.setAttribute('text-anchor','middle');
+    label.setAttribute('font-family','halyard-text,Inter,sans-serif');
+    label.setAttribute('font-weight','700');
+    label.setAttribute('font-size','11');
+    label.setAttribute('fill', VC.ink);
+    label.textContent = '#' + (i+1);
+    svgMap.appendChild(label);
+  });
+
+  // legend
+  legendHost.innerHTML = `
+    <span><span class="sw" style="background:${VC.magenta}"></span>Busiest corridor</span>
+    <span><span class="sw" style="background:${VC.orange}"></span>Next nine</span>
+    <span style="color:${VC.charcoal}">Dot size scales with pedestrian volume</span>
+  `;
+  noteHost.innerHTML = fr.blurb;
 }
-addLabel(-73.9855,40.758,'Times Sq');
-addLabel(-73.9875,40.7485,'Herald Sq');
+
+function selectBoro(b){
+  Array.from(tabsHost.children).forEach(btn=>{
+    btn.classList.toggle('active', btn.textContent===b);
+  });
+  drawBoro(b);
+}
+
+// --- deck navigation ---
+const deck = document.getElementById('deck');
+const dotsHost = document.getElementById('dots');
+const slides = deck.querySelectorAll('.slide');
+slides.forEach((s,i)=>{
+  const b = document.createElement('button');
+  b.className='dot'+(i===0?' active':'');
+  b.setAttribute('aria-label', 'Slide '+(i+1));
+  b.onclick = ()=> scrollToSlide(i);
+  dotsHost.appendChild(b);
+});
+function currentSlide(){
+  return Math.round(deck.scrollLeft / deck.clientWidth);
+}
+function scrollToSlide(i){
+  deck.scrollTo({left: i*deck.clientWidth, behavior:'smooth'});
+}
+let scrollTO=null;
+deck.addEventListener('scroll', ()=>{
+  const i = currentSlide();
+  Array.from(dotsHost.children).forEach((d,k)=>d.classList.toggle('active',k===i));
+  document.getElementById('prev').disabled = i===0;
+  document.getElementById('next').disabled = i===slides.length-1;
+  clearTimeout(scrollTO);
+  scrollTO=setTimeout(()=>Object.values(Chart.instances).forEach(c=>c.resize()), 80);
+});
+setTimeout(()=>Object.values(Chart.instances).forEach(c=>c.resize()), 120);
+window.addEventListener('resize',()=>Object.values(Chart.instances).forEach(c=>c.resize()));
+document.getElementById('prev').onclick = ()=>scrollToSlide(Math.max(0,currentSlide()-1));
+document.getElementById('next').onclick = ()=>scrollToSlide(Math.min(slides.length-1,currentSlide()+1));
+document.getElementById('prev').disabled = true;
+
+// init boro
+if (BORO_DATA) selectBoro('Manhattan');
 </script>
 </body>
 </html>
