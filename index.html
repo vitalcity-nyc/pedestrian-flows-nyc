@@ -1,0 +1,288 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>How New York walks</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;700;900&family=DM+Serif+Display&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<style>
+  :root{
+    --bg:#0f1419; --card:#151b21; --ink:#f6f7f4; --muted:#8a8f98;
+    --chartreuse:#dde44c; --orange:#ff7c53; --magenta:#e7466d;
+    --cerulean:#217ebe; --periwinkle:#9b9fbc; --rule:#2a3038;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0;background:transparent;color:var(--ink);
+    font-family:'DM Sans',system-ui,sans-serif;}
+  .wrap{max-width:700px;margin:0 auto;padding:16px 0;}
+  .card{background:var(--bg);border-radius:12px;overflow:hidden;
+    box-shadow:0 6px 28px rgba(0,0,0,.15);}
+  .pad{padding:28px 28px;}
+  .kicker{font-size:11px;letter-spacing:.18em;text-transform:uppercase;
+    color:var(--chartreuse);font-weight:700;margin-bottom:14px;}
+  h1{font-family:'DM Serif Display',Georgia,serif;font-weight:400;
+    font-size:34px;line-height:1.12;margin:0 0 10px;letter-spacing:-.01em;}
+  h2{font-family:'DM Sans',sans-serif;font-weight:900;font-size:18px;
+    margin:0 0 6px;letter-spacing:-.005em;}
+  .dek{color:var(--muted);font-size:15px;line-height:1.5;margin:0 0 4px;font-weight:300;}
+  .subdek{color:var(--muted);font-size:13px;line-height:1.45;margin:0 0 18px;font-weight:300;}
+  .rule{height:1px;background:var(--rule);margin:24px 0;}
+  .section{padding:22px 28px;}
+  .big{font-family:'DM Serif Display',serif;font-size:56px;line-height:1;
+    color:var(--chartreuse);margin:4px 0 4px;}
+  .big-small{font-size:13px;color:var(--muted);letter-spacing:.05em;
+    text-transform:uppercase;font-weight:700;}
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:20px;}
+  .stat{border-left:2px solid var(--chartreuse);padding:4px 0 4px 14px;}
+  .stat .n{font-family:'DM Serif Display',serif;font-size:30px;line-height:1;}
+  .stat .l{font-size:12px;color:var(--muted);margin-top:4px;line-height:1.35;}
+  canvas{max-width:100%;}
+  .chart-box{position:relative;width:100%;}
+  .chart-time{height:240px;}
+  .chart-od{height:300px;}
+  .annotation{font-size:12px;color:var(--muted);margin-top:10px;line-height:1.45;}
+  .annotation b{color:var(--ink);font-weight:700;}
+  .hl{color:var(--orange);font-weight:700;}
+  .map-wrap{position:relative;width:100%;aspect-ratio:1.4/1;background:#0a0d11;
+    border-radius:8px;overflow:hidden;margin-top:8px;}
+  .map-wrap svg{width:100%;height:100%;display:block;}
+  .legend{display:flex;gap:14px;flex-wrap:wrap;margin-top:10px;font-size:12px;color:var(--muted);}
+  .sw{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:6px;vertical-align:middle;}
+  footer{padding:18px 28px 24px;font-size:11px;color:var(--muted);
+    line-height:1.6;border-top:1px solid var(--rule);}
+  footer a{color:var(--muted);text-decoration:underline;}
+  .brand{display:flex;justify-content:space-between;align-items:center;gap:10px;}
+  .vc{font-family:'DM Sans',sans-serif;font-weight:900;letter-spacing:.14em;
+    font-size:11px;color:var(--ink);}
+  @media(max-width:520px){
+    .pad,.section,footer{padding-left:20px;padding-right:20px;}
+    h1{font-size:28px;} .big{font-size:44px;} .grid2{grid-template-columns:1fr;}
+  }
+</style>
+</head>
+<body>
+<div class="wrap"><div class="card">
+
+  <div class="pad">
+    <div class="kicker">Pedestrian flows / New York City</div>
+    <h1>How New York walks</h1>
+    <p class="dek">A block-by-block model of foot traffic across 315,577 sidewalk segments reveals a
+      city whose busiest hours are not the ones you'd expect.</p>
+  </div>
+
+  <div class="section">
+    <h2>The peak hour isn't rush hour</h2>
+    <p class="subdek">Estimated pedestrians on NYC sidewalks, summed across the five boroughs
+      (millions of segment-hours)</p>
+    <div class="chart-box chart-time"><canvas id="timeBars"></canvas></div>
+    <p class="annotation">
+      <b>Saturday evening is New York's busiest walking hour</b> — an estimated
+      <span class="hl">73.8 million</span> pedestrian-segments between 5 and 6 p.m., roughly
+      <span class="hl">27% more</span> than the weekday evening commute. Weekend mornings are the
+      quietest stretch the model captures.
+    </p>
+  </div>
+
+  <div class="rule" style="margin:0 28px"></div>
+
+  <div class="section">
+    <h2>Where New Yorkers walk to</h2>
+    <p class="subdek">Share of estimated pedestrian volume by journey type. Commuting home from work
+      narrowly leads — but trips to parks and neighborhood amenities nearly match it.</p>
+    <div class="chart-box chart-od"><canvas id="odBars"></canvas></div>
+    <p class="annotation">Home-to-job trips account for roughly
+      <b>20% of all modeled foot traffic.</b> Trips to parks (19%) and to restaurants, shops and
+      services (19%) together <b>outweigh every commute category combined.</b></p>
+  </div>
+
+  <div class="rule" style="margin:0 28px"></div>
+
+  <div class="section">
+    <h2>The busiest sidewalks in the city are all within 10 blocks</h2>
+    <p class="subdek">Location of the 50 highest-volume sidewalk segments at weekday midday.
+      Every one sits inside a half-square-mile of Midtown Manhattan.</p>
+    <div class="map-wrap"><svg viewBox="0 0 700 500" id="map"></svg></div>
+    <div class="legend">
+      <span><span class="sw" style="background:var(--orange)"></span>Top 50 segments (~2,400+ pedestrians/hr)</span>
+      <span><span class="sw" style="background:var(--periwinkle);opacity:.6"></span>Manhattan outline</span>
+    </div>
+    <p class="annotation">The busiest modeled block in the city runs along <b>7th Avenue near
+      West 49th Street</b>, with an estimated 2,800 pedestrians passing every midday hour.
+      Of 315,577 segments citywide, only <b>12</b> exceed 2,500 pedestrians per hour.</p>
+  </div>
+
+  <div class="rule" style="margin:0 28px"></div>
+
+  <div class="section">
+    <h2>By the numbers</h2>
+    <div class="grid2" style="margin-top:10px">
+      <div class="stat"><div class="n">315,577</div>
+        <div class="l">sidewalk and crosswalk segments modeled citywide</div></div>
+      <div class="stat"><div class="n">1,011</div>
+        <div class="l">locations where pedestrians were actually counted to calibrate the model</div></div>
+      <div class="stat"><div class="n">0.3%</div>
+        <div class="l">share of sidewalks that carry more than 1,000 pedestrians per midday hour</div></div>
+      <div class="stat"><div class="n">73.8M</div>
+        <div class="l">estimated pedestrian-segments in a single Saturday-evening hour</div></div>
+    </div>
+  </div>
+
+  <footer>
+    <div class="brand">
+      <div>Source: Sevtsuk, Basu, Liu &amp; Kollar (2025), "Spatial Distribution of Foot-traffic
+        in New York City," <i>Nature Cities</i>. Pedestrian estimates from the MIT City Form Lab
+        network, calibrated on 2018-2019 counts. Journey-type shares use uncalibrated
+        origin-destination estimates. Analysis by Vital City.</div>
+      <div class="vc">VITAL&nbsp;CITY</div>
+    </div>
+  </footer>
+</div></div>
+
+<script>
+const VC = {
+  chartreuse:'#dde44c', orange:'#ff7c53', magenta:'#e7466d',
+  cerulean:'#217ebe', periwinkle:'#9b9fbc', rose:'#cea9be',
+  indigo:'#394882', charcoal:'#8a8f98', ink:'#f6f7f4', rule:'#2a3038'
+};
+
+Chart.defaults.font.family = "'DM Sans', system-ui, sans-serif";
+Chart.defaults.color = VC.charcoal;
+
+// --- 1. Time-of-day bars ---
+new Chart(document.getElementById('timeBars'), {
+  type:'bar',
+  data:{
+    labels:['Wkdy 8-9a','Wkdy 12:30-1:30p','Wkdy 5-6p',
+            'Wknd 8-9a','Wknd 12:30-1:30p','Wknd 5-6p'],
+    datasets:[{
+      data:[49.3,51.8,58.1,40.4,52.3,73.8],
+      backgroundColor:(ctx)=> ctx.dataIndex===5 ? VC.orange : VC.chartreuse,
+      borderRadius:3, borderSkipped:false,
+    }]
+  },
+  options:{
+    responsive:true, maintainAspectRatio:false, animation:false,
+    plugins:{ legend:{display:false},
+      tooltip:{callbacks:{label:(c)=>c.parsed.y+'M pedestrian-segments'}}},
+    scales:{
+      x:{grid:{display:false},ticks:{color:VC.charcoal,font:{size:11}}},
+      y:{grid:{color:VC.rule},ticks:{color:VC.charcoal,callback:v=>v+'M'},
+         beginAtZero:true}
+    }
+  }
+});
+
+// --- 2. O-D journey bars ---
+const od = [
+  ['Home → job',          105.0],
+  ['Home → parks',        101.0],
+  ['Home → amenities',     99.2],
+  ['Home → school',        69.2],
+  ['Home → subway',        54.5],
+  ['Job → amenities',      47.2],
+  ['Job → subway',         34.3],
+  ['Amenity → amenity',     1.1],
+  ['Amenity → subway',      0.8],
+];
+new Chart(document.getElementById('odBars'),{
+  type:'bar',
+  data:{ labels:od.map(r=>r[0]),
+    datasets:[{data:od.map(r=>r[1]),
+      backgroundColor:od.map((_,i)=> i===0 ? VC.orange : VC.chartreuse),
+      borderRadius:3, borderSkipped:false }]},
+  options:{
+    indexAxis:'y', responsive:true, maintainAspectRatio:false, animation:false,
+    plugins:{legend:{display:false},
+      tooltip:{callbacks:{label:(c)=>c.parsed.x+'M trip-segments'}}},
+    scales:{
+      x:{grid:{color:VC.rule},ticks:{color:VC.charcoal,callback:v=>v+'M'},
+         beginAtZero:true},
+      y:{grid:{display:false},ticks:{color:VC.ink,font:{size:12,weight:'500'}}}
+    }
+  }
+});
+
+// --- 3. Midtown map: top 50 ---
+const TOP = [
+  [-73.97643,40.75974],[-73.98486,40.75356],[-73.98392,40.75444],[-73.97874,40.75334],
+  [-73.98242,40.75421],[-73.98388,40.75442],[-73.98397,40.75448],[-73.97784,40.75458],
+  [-73.97504,40.75837],[-73.97553,40.75775],[-73.98448,40.75409],[-73.98418,40.75498],
+  [-73.97696,40.75422],[-73.98522,40.75352],[-73.97756,40.75369],[-73.97740,40.75361],
+  [-73.97756,40.75369],[-73.97542,40.75786],[-73.97777,40.75802],[-73.97816,40.75257],
+  [-73.97818,40.75410],[-73.97862,40.75348],[-73.97461,40.75899],[-73.98478,40.75415],
+  [-73.97884,40.75358],[-73.98478,40.75417],[-73.97747,40.75380],[-73.98416,40.75411],
+  [-73.97862,40.75348],[-73.98530,40.75296],[-73.97894,40.75346],[-73.98388,40.75447],
+  [-73.97420,40.75957],[-73.97478,40.75922],[-73.97758,40.75531],[-73.97849,40.75409],
+  [-73.97525,40.75859],[-73.97803,40.75468],[-73.97803,40.75471],[-73.97529,40.75846],
+  [-73.98020,40.75414],[-73.97872,40.75336],[-73.97614,40.75980],[-73.97497,40.75849],
+  [-73.98008,40.75475],[-73.98398,40.75441],[-73.97691,40.75585],[-73.98486,40.75356],
+  [-73.97777,40.75304],[-73.97729,40.75861]
+];
+// simple equirectangular projection zoomed on Midtown
+const svg = document.getElementById('map');
+const NS = 'http://www.w3.org/2000/svg';
+// frame covering ~Times Square/Midtown -- extend to show surrounding Manhattan context
+const LON0=-74.02, LON1=-73.95, LAT0=40.735, LAT1=40.79;
+const W=700,H=500;
+const px = ([lon,lat])=> [ (lon-LON0)/(LON1-LON0)*W, H-(lat-LAT0)/(LAT1-LAT0)*H ];
+
+// Rough Manhattan outline (simplified polygon)
+const MANHATTAN = [
+  [-74.019,40.700],[-74.015,40.720],[-74.012,40.740],[-74.009,40.755],[-74.005,40.770],
+  [-74.000,40.780],[-73.995,40.790],[-73.985,40.800],[-73.970,40.810],[-73.955,40.825],
+  [-73.935,40.850],[-73.928,40.870],[-73.918,40.873],[-73.910,40.870],[-73.925,40.850],
+  [-73.935,40.835],[-73.945,40.820],[-73.955,40.805],[-73.965,40.792],[-73.972,40.780],
+  [-73.975,40.770],[-73.972,40.762],[-73.968,40.758],[-73.965,40.752],[-73.963,40.745],
+  [-73.960,40.738],[-73.955,40.732],[-73.950,40.726],[-73.945,40.720],[-73.943,40.716],
+  [-73.975,40.710],[-73.995,40.705],[-74.010,40.700],[-74.019,40.700]
+];
+const outline = document.createElementNS(NS,'path');
+outline.setAttribute('d','M '+MANHATTAN.map(c=>px(c).map(v=>v.toFixed(1)).join(',')).join(' L ')+' Z');
+outline.setAttribute('fill','rgba(155,159,188,0.07)');
+outline.setAttribute('stroke','rgba(155,159,188,0.35)');
+outline.setAttribute('stroke-width','1');
+svg.appendChild(outline);
+
+// grid hint: 42nd, 59th streets
+function addHline(lat,label){
+  const y = px([-73.98,lat])[1];
+  const l = document.createElementNS(NS,'line');
+  l.setAttribute('x1',0);l.setAttribute('x2',W);l.setAttribute('y1',y);l.setAttribute('y2',y);
+  l.setAttribute('stroke','rgba(155,159,188,0.12)');l.setAttribute('stroke-dasharray','3 3');
+  svg.appendChild(l);
+  const t = document.createElementNS(NS,'text');
+  t.setAttribute('x',8);t.setAttribute('y',y-4);
+  t.setAttribute('fill','rgba(155,159,188,0.55)');t.setAttribute('font-size','11');
+  t.textContent=label; svg.appendChild(t);
+}
+addHline(40.7580,'W 42nd St');
+addHline(40.7660,'W 59th St / Central Park South');
+
+// dots
+TOP.forEach(c=>{
+  const [x,y]=px(c);
+  const halo = document.createElementNS(NS,'circle');
+  halo.setAttribute('cx',x);halo.setAttribute('cy',y);halo.setAttribute('r',9);
+  halo.setAttribute('fill','rgba(255,124,83,0.18)');svg.appendChild(halo);
+  const dot = document.createElementNS(NS,'circle');
+  dot.setAttribute('cx',x);dot.setAttribute('cy',y);dot.setAttribute('r',3.2);
+  dot.setAttribute('fill',VC.orange);svg.appendChild(dot);
+});
+
+// label Times Square approx
+function addLabel(lon,lat,text){
+  const [x,y]=px([lon,lat]);
+  const t = document.createElementNS(NS,'text');
+  t.setAttribute('x',x+10);t.setAttribute('y',y);
+  t.setAttribute('fill',VC.ink);t.setAttribute('font-size','12');
+  t.setAttribute('font-weight','700');
+  t.textContent=text; svg.appendChild(t);
+}
+addLabel(-73.9855,40.758,'Times Sq');
+addLabel(-73.9875,40.7485,'Herald Sq');
+</script>
+</body>
+</html>
