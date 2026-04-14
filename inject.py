@@ -9,7 +9,7 @@ DATA = json.load(open('/Users/joshgreenman/Experiments/pedestrian-flows-nyc/by_b
 outlines = {}
 for f in BORO['features']:
     name = f['properties'].get('name') or f['properties'].get('BoroName')
-    g = shape(f['geometry']).simplify(0.002, preserve_topology=True)
+    g = shape(f['geometry']).simplify(0.0005, preserve_topology=True)
     rings = []
     if g.geom_type == 'Polygon':
         polys = [g]
@@ -27,12 +27,14 @@ for b, cs in DATA['boroughs'].items():
     corridors['boroughs'][b] = [{
         "peak_wkdyMD": c['peak_wkdyMD'],
         "lon": c['lon'], "lat": c['lat'],
-        "wkdyAM": c.get('wkdyAM'), "wkdyPM": c.get('wkdyPM'),
-        "wkndMD": c.get('wkndMD'), "wkndPM": c.get('wkndPM'),
+        "lines": c.get('lines', [])[:15],
     } for c in cs[:10]]
 
+import re
 html = open('/Users/joshgreenman/Experiments/pedestrian-flows-nyc/index.html').read()
-html = html.replace('/*__BORODATA__*/null', json.dumps(corridors))
-html = html.replace('/*__OUTLINES__*/ {}', json.dumps(outlines))
+html = re.sub(r'const BORO_DATA = [^;]+;',
+              'const BORO_DATA = ' + json.dumps(corridors) + ';', html, count=1)
+html = re.sub(r'const BORO_OUTLINES = [^;]+;',
+              'const BORO_OUTLINES = ' + json.dumps(outlines) + ';', html, count=1)
 open('/Users/joshgreenman/Experiments/pedestrian-flows-nyc/index.html','w').write(html)
 print('injected; outline sizes:', {k: sum(len(r) for r in v) for k,v in outlines.items()})
