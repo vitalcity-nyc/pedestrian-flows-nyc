@@ -48,6 +48,39 @@
   .maplibregl-canvas{outline:none;}
   .maplibregl-ctrl-attrib{font-size:10px;}
 
+  /* fullscreen toggle */
+  .fs-btn{position:absolute;top:8px;left:8px;z-index:12;
+    display:inline-flex;align-items:center;gap:6px;
+    background:#fff;border:1px solid var(--ink);color:var(--ink);
+    font:inherit;font-size:11px;font-weight:700;padding:5px 9px;
+    border-radius:3px;cursor:pointer;
+    box-shadow:0 2px 6px rgba(0,0,0,.10);}
+  .fs-btn:hover{background:var(--ink);color:#fff;}
+  .fs-btn svg{display:block;}
+  .fs-mode .fs-btn{top:12px;left:12px;}
+  .fs-mode .fs-btn .lbl-exit{display:inline;}
+  .fs-mode .fs-btn .lbl-enter{display:none;}
+
+  /* In fullscreen (either native API or :fullscreen class fallback) */
+  :fullscreen, .fs-mode{background:var(--paper);}
+  :fullscreen .frame, .fs-mode .frame{
+    max-width:none;width:100vw;height:100vh;padding:0;
+    display:flex;flex-direction:column;}
+  :fullscreen .eyebrow, :fullscreen h1, :fullscreen .dek,
+  :fullscreen .stat-row, :fullscreen footer,
+  .fs-mode .eyebrow, .fs-mode h1, .fs-mode .dek,
+  .fs-mode .stat-row, .fs-mode footer{display:none;}
+  :fullscreen .ctrls, .fs-mode .ctrls{
+    margin:0;border-radius:0;border:0;border-bottom:1px solid var(--rule);
+    padding:10px 14px;}
+  :fullscreen .map-wrap, .fs-mode .map-wrap{
+    flex:1;border-radius:0;border:0;}
+  :fullscreen #map, .fs-mode #map{height:100%;}
+  :fullscreen .legend, .fs-mode .legend{
+    position:absolute;bottom:10px;left:12px;z-index:11;background:#fff;
+    border:1px solid var(--rule);padding:6px 10px;border-radius:3px;
+    margin:0;}
+
   .legend{display:flex;flex-wrap:wrap;gap:8px 14px;align-items:center;
     margin:8px 0 0;font-size:11px;color:var(--charcoal);}
   .legend .ramp{position:relative;width:190px;height:8px;border-radius:4px;
@@ -116,9 +149,17 @@
     </div>
   </div>
 
-  <div class="map-wrap">
+  <div class="map-wrap" id="mapWrap">
     <div id="map"></div>
     <div id="readout" class="readout hide"></div>
+    <button id="fsBtn" class="fs-btn" title="Expand to full screen" aria-label="Full screen">
+      <svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true">
+        <path d="M1 1h5v1.6H2.6V6H1V1zm14 0v5h-1.6V2.6H10V1h5zM1 15v-5h1.6v3.4H6V15H1zm14 0h-5v-1.6h3.4V10H15v5z"
+          fill="currentColor"/>
+      </svg>
+      <span class="lbl-enter">Full screen</span>
+      <span class="lbl-exit" style="display:none">Exit full screen</span>
+    </button>
   </div>
 
   <div class="legend">
@@ -282,6 +323,41 @@ document.getElementById('daySeg').addEventListener('click', e=>{
 document.getElementById('todSeg').addEventListener('click', e=>{
   const b = e.target.closest('button'); if(!b) return;
   state.tod = b.dataset.v; setSeg('todSeg', state.tod); applyState();
+});
+
+// --- full-screen toggle (works in-page; iframe parent must allow fullscreen) ---
+const fsBtn = document.getElementById('fsBtn');
+function updateFsBtn(){
+  const on = document.body.classList.contains('fs-mode') || !!document.fullscreenElement;
+  fsBtn.querySelector('.lbl-enter').style.display = on ? 'none' : 'inline';
+  fsBtn.querySelector('.lbl-exit').style.display  = on ? 'inline' : 'none';
+  fsBtn.setAttribute('title', on ? 'Exit full screen' : 'Expand to full screen');
+  setTimeout(()=> map.resize(), 60);
+}
+function enterFs(){
+  const el = document.documentElement;
+  const req = el.requestFullscreen || el.webkitRequestFullscreen;
+  document.body.classList.add('fs-mode');
+  if (req) { try { req.call(el); } catch(e){} }
+  updateFsBtn();
+}
+function exitFs(){
+  document.body.classList.remove('fs-mode');
+  if (document.fullscreenElement && document.exitFullscreen) {
+    document.exitFullscreen().catch(()=>{});
+  } else if (document.webkitFullscreenElement && document.webkitExitFullscreen) {
+    document.webkitExitFullscreen();
+  }
+  updateFsBtn();
+}
+fsBtn.addEventListener('click', ()=>{
+  const on = document.body.classList.contains('fs-mode') || !!document.fullscreenElement;
+  on ? exitFs() : enterFs();
+});
+document.addEventListener('fullscreenchange', updateFsBtn);
+document.addEventListener('webkitfullscreenchange', updateFsBtn);
+document.addEventListener('keydown', (e)=>{
+  if (e.key === 'Escape' && document.body.classList.contains('fs-mode')) exitFs();
 });
 </script>
 </body>
