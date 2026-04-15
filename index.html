@@ -49,7 +49,7 @@
   .maplibregl-ctrl-attrib{font-size:10px;}
 
   /* fullscreen toggle */
-  .fs-btn{position:absolute;top:8px;left:8px;z-index:12;
+  .fs-btn{position:absolute;top:8px;right:48px;z-index:12;
     display:inline-flex;align-items:center;gap:6px;
     background:#fff;border:1px solid var(--ink);color:var(--ink);
     font:inherit;font-size:11px;font-weight:700;padding:5px 9px;
@@ -57,9 +57,26 @@
     box-shadow:0 2px 6px rgba(0,0,0,.10);}
   .fs-btn:hover{background:var(--ink);color:#fff;}
   .fs-btn svg{display:block;}
-  .fs-mode .fs-btn{top:12px;left:12px;}
+  .fs-mode .fs-btn{top:12px;right:12px;}
   .fs-mode .fs-btn .lbl-exit{display:inline;}
   .fs-mode .fs-btn .lbl-enter{display:none;}
+
+  /* in-map title shown only in fullscreen */
+  .fs-title{display:none;}
+  :fullscreen .fs-title, .fs-mode .fs-title{
+    display:block;position:absolute;top:14px;left:14px;z-index:11;
+    background:rgba(255,255,255,.94);backdrop-filter:blur(3px);
+    border:1px solid var(--rule);border-radius:3px;
+    padding:10px 13px 11px;max-width:360px;
+    box-shadow:0 3px 12px rgba(0,0,0,.08);}
+  .fs-title .fs-eyebrow{font-size:10px;letter-spacing:.14em;text-transform:uppercase;
+    font-weight:700;color:var(--magenta);margin:0 0 4px;}
+  .fs-title .fs-head{font-family:"halyard-text";font-weight:900;
+    font-size:19px;line-height:1.12;letter-spacing:-0.01em;color:var(--ink);
+    margin:0 0 6px;}
+  .fs-title .fs-sum{font-size:12px;line-height:1.4;color:#2c2c2c;
+    font-weight:300;margin:0;}
+  .fs-title .fs-sum b{font-weight:700;}
 
   /* In fullscreen (either native API or :fullscreen class fallback) */
   :fullscreen, .fs-mode{background:var(--paper);}
@@ -152,6 +169,13 @@
   <div class="map-wrap" id="mapWrap">
     <div id="map"></div>
     <div id="readout" class="readout hide"></div>
+    <div id="fsTitle" class="fs-title">
+      <p class="fs-eyebrow">Pedestrian flows / New York City</p>
+      <h2 class="fs-head">Where New Yorkers walk, and when</h2>
+      <p class="fs-sum">Modeled hourly pedestrian volume on all <b>315,577 sidewalk
+        and crosswalk segments</b>. Toggle the controls to compare weekday and
+        weekend, morning rush, midday, and evening.</p>
+    </div>
     <button id="fsBtn" class="fs-btn" title="Expand to full screen" aria-label="Full screen">
       <svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true">
         <path d="M1 1h5v1.6H2.6V6H1V1zm14 0v5h-1.6V2.6H10V1h5zM1 15v-5h1.6v3.4H6V15H1zm14 0h-5v-1.6h3.4V10H15v5z"
