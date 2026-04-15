@@ -81,6 +81,9 @@
     margin:6px 0 0;padding-top:6px;border-top:1px solid var(--rule);}
   .fs-title .fs-src a{color:var(--charcoal);text-decoration:underline;}
   .fs-title .fs-src a:hover{color:var(--ink);}
+  /* In fullscreen, move the segment readout to bottom-left so it doesn't
+     collide with the title card in the upper-left. */
+  :fullscreen .readout, .fs-mode .readout{top:auto;bottom:14px;left:14px;}
 
   /* In fullscreen (either native API or :fullscreen class fallback) */
   :fullscreen, .fs-mode{background:var(--paper);}
