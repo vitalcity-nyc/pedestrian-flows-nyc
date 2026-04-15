@@ -77,6 +77,10 @@
   .fs-title .fs-sum{font-size:12px;line-height:1.4;color:#2c2c2c;
     font-weight:300;margin:0;}
   .fs-title .fs-sum b{font-weight:700;}
+  .fs-title .fs-src{font-size:10.5px;line-height:1.35;color:var(--charcoal);
+    margin:6px 0 0;padding-top:6px;border-top:1px solid var(--rule);}
+  .fs-title .fs-src a{color:var(--charcoal);text-decoration:underline;}
+  .fs-title .fs-src a:hover{color:var(--ink);}
 
   /* In fullscreen (either native API or :fullscreen class fallback) */
   :fullscreen, .fs-mode{background:var(--paper);}
@@ -175,6 +179,7 @@
       <p class="fs-sum">Modeled hourly pedestrian volume on all <b>315,577 sidewalk
         and crosswalk segments</b>. Toggle the controls to compare weekday and
         weekend, morning rush, midday, and evening.</p>
+      <p class="fs-src">Source: <a href="https://www.nature.com/articles/s44284-025-00383-y" target="_blank" rel="noopener">Sevtsuk et al., <i>Nature Cities</i> 2025</a> &middot; <a href="https://dusp.mit.edu/people/andres-sevtsuk" target="_blank" rel="noopener">Andres Sevtsuk</a> / <a href="https://cityform.mit.edu/people" target="_blank" rel="noopener">MIT City Form Lab</a></p>
     </div>
     <button id="fsBtn" class="fs-btn" title="Expand to full screen" aria-label="Full screen">
       <svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true">
@@ -204,14 +209,18 @@
   </div>
 
   <footer>
-    <b>Source:</b> Sevtsuk, A., Basu, R., et al. <i>Estimating Pedestrian Flows on Street
-    Networks in New York City</i> (<i>Nature Cities</i>, 2025), using the NYC Pedestrian
-    Network Estimates dataset (2018–2019). Volumes are modeled estimates calibrated against
-    1,011 field counts — not direct observation. The model leans on street-network accessibility
-    and transit proximity, so it can under-predict recreational and seasonal foot traffic at
-    beaches, parks, and boardwalks. Basemap © <a href="https://carto.com/attributions">CARTO</a>
-    / <a href="https://openstreetmap.org/copyright">OpenStreetMap</a>. Tiles built with
-    <a href="https://github.com/felt/tippecanoe">tippecanoe</a>.
+    <b>Source:</b>
+    <a href="https://www.nature.com/articles/s44284-025-00383-y" target="_blank" rel="noopener">Sevtsuk, A., Basu, R., et al., <i>Estimating Pedestrian Flows on Street
+    Networks in New York City</i>, <i>Nature Cities</i>, 2025</a>, using the NYC Pedestrian
+    Network Estimates dataset (2018–2019). Work led by
+    <a href="https://dusp.mit.edu/people/andres-sevtsuk" target="_blank" rel="noopener">Andres Sevtsuk</a>
+    and the <a href="https://cityform.mit.edu/people" target="_blank" rel="noopener">MIT City Form Lab</a>.
+    Volumes are modeled estimates calibrated against 1,011 field counts — not direct observation.
+    The model leans on street-network accessibility and transit proximity, so it can
+    under-predict recreational and seasonal foot traffic at beaches, parks, and boardwalks.
+    Basemap © <a href="https://carto.com/attributions" target="_blank" rel="noopener">CARTO</a>
+    / <a href="https://openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a>.
+    Tiles built with <a href="https://github.com/felt/tippecanoe" target="_blank" rel="noopener">tippecanoe</a>.
     &nbsp;·&nbsp; Produced for <b>Vital City</b>.
   </footer>
 </div>
