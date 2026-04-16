@@ -14,7 +14,8 @@
   }
   *{box-sizing:border-box}
   html,body{margin:0;padding:0;background:var(--paper);color:var(--ink);
-    font-family:"halyard-text",Inter,system-ui,sans-serif;font-weight:300;}
+    font-family:"halyard-text",Inter,system-ui,sans-serif;font-weight:300;
+    overflow-x:hidden;}
   .frame{max-width:640px;margin:0 auto;padding:18px 0 20px;}
   .eyebrow{font-size:10px;letter-spacing:.14em;text-transform:uppercase;
     font-weight:700;color:var(--magenta);margin:0 0 6px;}
@@ -398,6 +399,27 @@ document.addEventListener('webkitfullscreenchange', updateFsBtn);
 document.addEventListener('keydown', (e)=>{
   if (e.key === 'Escape' && document.body.classList.contains('fs-mode')) exitFs();
 });
+
+/* ---- Auto-resize when embedded in an iframe (e.g. Ghost) ------------- */
+/* Reports current document height to the parent so a listener on the    */
+/* host page can size the iframe exactly and eliminate the scrollbar.    */
+(function(){
+  if (window.parent === window) return; // not embedded
+  var last = 0;
+  function post(){
+    // Don't report while in fullscreen — the frame fills the viewport then.
+    if (document.fullscreenElement || document.body.classList.contains('fs-mode')) return;
+    var h = Math.ceil(document.documentElement.getBoundingClientRect().height);
+    if (h && Math.abs(h - last) > 1) {
+      last = h;
+      try { window.parent.postMessage({type:'pedflows:height', height:h}, '*'); } catch(e){}
+    }
+  }
+  window.addEventListener('load', post);
+  window.addEventListener('resize', post);
+  if (window.ResizeObserver) new ResizeObserver(post).observe(document.body);
+  setInterval(post, 1000);
+})();
 </script>
 </body>
 </html>
